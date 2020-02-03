@@ -9,6 +9,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import StaleElementReferenceException
 
 # parse HTML tweets
 from bs4 import BeautifulSoup as bs
@@ -34,10 +35,11 @@ def login_twitter(driver, USERNAME, PASSWORD):
  
     # open the web page in the browser:
     driver.get("https://twitter.com/login")
+    driver.implicitly_wait(2)
  
     # find the boxes for username and password
-    username_field = driver.find_element_by_class_name("js-username-field")
-    password_field = driver.find_element_by_class_name("js-password-field")
+    username_field = driver.find_element_by_name("session[username_or_email]")
+    password_field = driver.find_element_by_name("session[password]")
  
     # enter credentials
     username_field.send_keys(USERNAME)
@@ -46,7 +48,7 @@ def login_twitter(driver, USERNAME, PASSWORD):
     driver.implicitly_wait(1)
  
     # click the "Log In" button:
-    driver.find_element_by_class_name("EdgeButtom--medium").click()
+    driver.find_element_by_xpath("//*[@id=\"react-root\"]/div/div/div[1]/main/div/div/form/div/div[3]/div").click()
  
     return
 
@@ -59,7 +61,7 @@ class WaitForMoreThanNElementsToBePresent(object):
         try:
             elements = EC._find_elements(driver, self.locator)
             return len(elements) > self.count
-        except StaleElementReferenceException:
+        except selenium.common.exceptions.StaleElementReferenceException:
             return False
 
 def search_twitter(driver, query):
@@ -179,8 +181,9 @@ if __name__ == "__main__":
     driver = init_driver()
  
     # log in to twitter (replace username/password with your own)
-    USERNAME = "<<USERNAME>>"
-    PASSWORD = "<<PASSWORD>>"
+    ##Temp Email: mk7g57yknd@montokop.pw
+    USERNAME = "Jon102938"
+    PASSWORD = "mk7g57yknd"
     login_twitter(driver, USERNAME, PASSWORD)
  
     # search twitter
