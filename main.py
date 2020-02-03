@@ -31,6 +31,8 @@ def init_driver():
 
 def login_twitter(driver):
  
+    #TODO Look into https://twitter.com/search-advanced / Making a UI for these inputs specifically
+
     # open the web page in the browser:
     driver.get("https://twitter.com/explore")
  
@@ -48,13 +50,13 @@ class WaitForMoreThanNElementsToBePresent(object):
         except selenium.common.exceptions.StaleElementReferenceException:
             return False
 
-def search_twitter(driver, query):
+def search_twitter(driver, keywords):
  
     # wait until the search box has loaded to search within it
-    box = driver.wait.until(EC.presence_of_element_located((By.CLASS_NAME, "q")))
-    driver.find_element_by_name("q").clear()
-    # your typed query is typed in
-    box.send_keys(query)
+    box = driver.wait.until(EC.presence_of_element_located((By.XPATH, "//*[@id=\"react-root\"]/div/div/div[2]/header/div[2]/div[1]/div[1]/div/div[2]/div/div/div/form/div[1]/div/div/div[2]/input")))
+    driver.find_element_by_xpath("//*[@id=\"react-root\"]/div/div/div[2]/header/div[2]/div[1]/div[1]/div/div[2]/div/div/div/form/div[1]/div/div/div[2]/input").clear()
+    # your typed keywords is typed in
+    box.send_keys(keywords)
     box.submit()
 
     
@@ -171,8 +173,8 @@ if __name__ == "__main__":
  
     # What is written in the twitter searchbar
     #TODO Should I be querying for hashtages or strictly keywords
-    query = "Python"
-    page_source = search_twitter(driver, query)
+    keywords = "Suffolk County"
+    page_source = search_twitter(driver, keywords)
  
     # extract info from the search results
     tweets = extract_tweets(page_source)
