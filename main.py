@@ -95,7 +95,7 @@ def search_twitter(driver, keywords):
     except TimeoutException:
  
         # if there are no search results then the "wait.until" call in the first "try" statement will never happen and it will time out. So we catch that exception and return no html
-        page_source=None
+        page_source=None #TODO Throws errors at bs4 when NONE
  
     return page_source
 
