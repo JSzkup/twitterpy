@@ -38,6 +38,7 @@ def login_twitter(driver):
  
     return
 
+# scrolls the page/waits for more elements to be visible to scroll again
 class WaitForMoreThanNElementsToBePresent(object):
     def __init__(self, locator, count):
         self.locator = locator
@@ -59,20 +60,22 @@ def search_twitter(driver, keywords):
     box.send_keys(keywords)
     box.submit()
 
-    
- 
     # initial wait for the search results to load
     wait = WebDriverWait(driver, 10)
  
+    #TODO click the LATEST tab to get the recent most tweets talking about the keywords
+    driver.find_element_by_xpath("//*[@id=\"react-root\"]/div/div/div[2]/header/div[2]/div[1]/div[2]/nav/div[2]/div[2]/a/div").click()
+    driver.wait = WebDriverWait(driver, 5) 
+
     try:
         # wait until the first search result is found. Search results will be tweets, which are html list items and have the class='data-item-id'
-        wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "li[data-item-id]")))
+        wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "data-testid=\"tweet\"")))
  
         # scroll down to the last tweet until there are no more tweets
         while True:
  
             # extract all the tweets
-            tweets = driver.find_elements_by_css_selector("li[data-item-id]")
+            tweets = driver.find_elements_by_css_selector("data-testid=\"tweet\"")
  
             # find number of visible tweets
             number_of_tweets = len(tweets)
@@ -83,7 +86,7 @@ def search_twitter(driver, keywords):
             try:
                 # wait for more tweets to be visible
                 wait.until(WaitForMoreThanNElementsToBePresent(
-                    (By.CSS_SELECTOR, "li[data-item-id]"), number_of_tweets))
+                    (By.CSS_SELECTOR, "data-testid=\"tweet\""), number_of_tweets))
  
             except TimeoutException:
                 # if no more are visible the "wait.until" call will timeout. Catch the exception and exit the while loop
@@ -107,12 +110,12 @@ def extract_tweets(page_source):
     for li in soup.find_all("li", class_='js-stream-item'):
  
         # If our li doesn't have a tweet-id, we skip it as it's not going to be a tweet.
-        if 'data-item-id' not in li.attrs:
+        if 'data-testid=\"tweet\"' not in li.attrs:
             continue
  
         else:
             tweet = {
-                'tweet_id': li['data-item-id'],
+                'tweet_id': li['data-testid=\"tweet\"'],
                 'text': None,
                 'user_id': None,
                 'user_screen_name': None,
@@ -184,9 +187,17 @@ if __name__ == "__main__":
     close_driver(driver)
 
 
+""" 
+Might be a better Idea to use scrapy or Tweepy with the Twitter API
+Tweepy would make pulling info from tweets easier but I need API keys
+scrapy would make organizing the data after scraping easier
+"""
 
 """ Reference
+https://twitter.com/robots.txt
 https://selenium-python.readthedocs.io/
+https://www.crummy.com/software/BeautifulSoup/bs4/doc/
 https://towardsdatascience.com/web-scrape-twitter-by-python-selenium-part-1-b3e2db29051d
 https://towardsdatascience.com/selenium-tweepy-to-scrap-tweets-from-tweeter-and-analysing-sentiments-1804db3478ac
+https://towardsdatascience.com/hands-on-web-scraping-building-your-own-twitter-dataset-with-python-and-scrapy-8823fb7d0598
 """
