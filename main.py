@@ -2,9 +2,13 @@
 # Create an admin ui to select different keywords/see info
 
 # import selenium for use with Chrome automation
+import selenium
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 
 # parse HTML tweets
 from bs4 import BeautifulSoup as bs
@@ -46,7 +50,7 @@ def login_twitter(driver, USERNAME, PASSWORD):
  
     return
 
-class wait_for_more_than_n_elements_to_be_present(object):
+class WaitForMoreThanNElementsToBePresent(object):
     def __init__(self, locator, count):
         self.locator = locator
         self.count = count
@@ -88,7 +92,7 @@ def search_twitter(driver, query):
  
             try:
                 # wait for more tweets to be visible
-                wait.until(wait_for_more_than_n_elements_to_be_present(
+                wait.until(WaitForMoreThanNElementsToBePresent(
                     (By.CSS_SELECTOR, "li[data-item-id]"), number_of_tweets))
  
             except TimeoutException:
@@ -175,8 +179,8 @@ if __name__ == "__main__":
     driver = init_driver()
  
     # log in to twitter (replace username/password with your own)
-    USERNAME = <<USERNAME>>
-    PASSWORD = <<PASSWORD>>
+    USERNAME = "<<USERNAME>>"
+    PASSWORD = "<<PASSWORD>>"
     login_twitter(driver, USERNAME, PASSWORD)
  
     # search twitter
