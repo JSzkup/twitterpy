@@ -9,6 +9,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import StaleElementReferenceException
 
 # parse HTML tweets
 from bs4 import BeautifulSoup as bs
@@ -21,8 +22,6 @@ import datetime
 import numpy
 import pandas
 
-
-
 def init_driver():
     #Chrome 79
     driver = webdriver.Chrome(r'C:\PythonFiles\TwitterScraper\chromedriver.exe')
@@ -30,23 +29,10 @@ def init_driver():
 
     return driver
 
-def login_twitter(driver, USERNAME, PASSWORD):
+def login_twitter(driver):
  
     # open the web page in the browser:
-    driver.get("https://twitter.com/login")
- 
-    # find the boxes for username and password
-    username_field = driver.find_element_by_class_name("js-username-field")
-    password_field = driver.find_element_by_class_name("js-password-field")
- 
-    # enter credentials
-    username_field.send_keys(USERNAME)
-    driver.implicitly_wait(1)
-    password_field.send_keys(PASSWORD)
-    driver.implicitly_wait(1)
- 
-    # click the "Log In" button:
-    driver.find_element_by_class_name("EdgeButtom--medium").click()
+    driver.get("https://twitter.com/explore")
  
     return
 
@@ -59,17 +45,19 @@ class WaitForMoreThanNElementsToBePresent(object):
         try:
             elements = EC._find_elements(driver, self.locator)
             return len(elements) > self.count
-        except StaleElementReferenceException:
+        except selenium.common.exceptions.StaleElementReferenceException:
             return False
 
 def search_twitter(driver, query):
  
     # wait until the search box has loaded to search within it
-    box = driver.wait.until(EC.presence_of_element_located((By.NAME, "q")))
+    box = driver.wait.until(EC.presence_of_element_located((By.CLASS_NAME, "q")))
     driver.find_element_by_name("q").clear()
     # your typed query is typed in
     box.send_keys(query)
     box.submit()
+
+    
  
     # initial wait for the search results to load
     wait = WebDriverWait(driver, 10)
@@ -179,12 +167,11 @@ if __name__ == "__main__":
     driver = init_driver()
  
     # log in to twitter (replace username/password with your own)
-    USERNAME = "<<USERNAME>>"
-    PASSWORD = "<<PASSWORD>>"
-    login_twitter(driver, USERNAME, PASSWORD)
+    login_twitter(driver)
  
-    # search twitter
-    query = "what ever you want to search for"
+    # What is written in the twitter searchbar
+    #TODO Should I be querying for hashtages or strictly keywords
+    query = "Python"
     page_source = search_twitter(driver, query)
  
     # extract info from the search results
