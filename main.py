@@ -70,42 +70,42 @@ def search_twitter(driver, keywords):
 
     try:
         # wait until the first search result is found. Search results will be tweets, which are html list items and have the class='data-item-id'
-        wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "data-testid=\"tweet\"")))
+        wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "[aria-label=\"Timeline: Search timeline\"]")))
  
         # scroll down to the last tweet until there are no more tweets
         while True:
  
             # extract all the tweets
-            tweets = driver.find_elements_by_css_selector("data-testid=\"tweet\"")
+            tweets = driver.find_elements_by_css_selector("li[data-item-id]")
  
             # find number of visible tweets
             number_of_tweets = len(tweets)
  
             # keep scrolling
-            driver.execute_script("arguments[0].scrollIntoView();", tweets[-1])
+            driver.execute_script("arguments[0].scrollIntoView(true);", tweets[-1])
  
             try:
                 # wait for more tweets to be visible
                 wait.until(WaitForMoreThanNElementsToBePresent(
-                    (By.CSS_SELECTOR, "data-testid=\"tweet\""), number_of_tweets))
+                    (By.CSS_SELECTOR, "li[data-item-id]"), number_of_tweets))
  
             except TimeoutException:
                 # if no more are visible the "wait.until" call will timeout. Catch the exception and exit the while loop
                 break
  
         # extract the html for the whole lot
-        page_source = driver.page_source
+        pageSource = driver.page_source
  
     except TimeoutException:
  
         # if there are no search results then the "wait.until" call in the first "try" statement will never happen and it will time out. So we catch that exception and return no html
-        page_source=None #TODO Throws errors at bs4 when NONE
+        pageSource=None #TODO Throws errors at bs4 when NONE
  
-    return page_source
+    return pageSource
 
-def extract_tweets(page_source):
+def extract_tweets(pageSource):
  
-    soup = bs(page_source,'lxml')
+    soup = bs(pageSource,'lxml')
  
     tweets = []
     for li in soup.find_all("li", class_='js-stream-item'):
@@ -175,13 +175,12 @@ if __name__ == "__main__":
     # log in to twitter (replace username/password with your own)
     login_twitter(driver)
  
-    # What is written in the twitter searchbar
-    #TODO Should I be querying for hashtages or strictly keywords
+    # What is written in the twitter searchbar TODO look into advanced search
     keywords = "Suffolk County"
-    page_source = search_twitter(driver, keywords)
+    pageSource = search_twitter(driver, keywords)
  
     # extract info from the search results
-    tweets = extract_tweets(page_source)
+    tweets = extract_tweets(pageSource)
 
  
     # close the driver:
@@ -192,13 +191,4 @@ if __name__ == "__main__":
 Might be a better Idea to use scrapy or Tweepy with the Twitter API
 Tweepy would make pulling info from tweets easier but I need API keys
 scrapy would make organizing the data after scraping easier
-"""
-
-""" Reference
-https://twitter.com/robots.txt
-https://selenium-python.readthedocs.io/
-https://www.crummy.com/software/BeautifulSoup/bs4/doc/
-https://towardsdatascience.com/web-scrape-twitter-by-python-selenium-part-1-b3e2db29051d
-https://towardsdatascience.com/selenium-tweepy-to-scrap-tweets-from-tweeter-and-analysing-sentiments-1804db3478ac
-https://towardsdatascience.com/hands-on-web-scraping-building-your-own-twitter-dataset-with-python-and-scrapy-8823fb7d0598
 """
