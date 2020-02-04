@@ -55,6 +55,7 @@ class WaitForMoreThanNElementsToBePresent(object):
 def search_twitter(driver, keywords):
  
     # wait until the search box has loaded to search within it
+    wait = WebDriverWait(driver, 10)
     box = driver.wait.until(EC.presence_of_element_located((By.XPATH, "//*[@id=\"react-root\"]/div/div/div[2]/header/div[2]/div[1]/div[1]/div/div[2]/div/div/div/form/div[1]/div/div/div[2]/input")))
     driver.find_element_by_xpath("//*[@id=\"react-root\"]/div/div/div[2]/header/div[2]/div[1]/div[1]/div/div[2]/div/div/div/form/div[1]/div/div/div[2]/input").clear()
     # your typed keywords is typed in
@@ -62,9 +63,8 @@ def search_twitter(driver, keywords):
     box.submit()
 
     # initial wait for the search results to load
-    wait = WebDriverWait(driver, 10)
+    driver.implicitly_wait(1)
  
-    # clicks on "Latest" tab to scrub through the most recent tweets
     driver.find_element_by_link_text("Latest").click()
     driver.wait = WebDriverWait(driver, 1) 
 

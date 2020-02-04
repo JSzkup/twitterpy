@@ -1,21 +1,13 @@
-Dependencies:
+ChromeDriver also needed, for the specific version of Chrome you ar running
+https://chromedriver.chromium.org/
 
-Selenium 
-    ChromeWebdriver (for your specific version of chrome)
-Numpy
-Pandas
-lxml
+To install Requirements:
+$ pip install -Ur requirements.txt
 
-Twitter Account:
-https://temp-mail.io/
-mk7g57yknd@montokop.pw
+GMAIL ACCOUNT:
+webdevintern619
+vg4l7xhjfh1029
 
-USERNAME = "Jon102938"
-PASSWORD = "mk7g57yknd"
-
-
-API ACCOUNT:
-vg4l7xhjfh@cloud-mail.top
-
-USERNAME = "Jon90210"
-PASSWORD = "vg4l7xhjfh"
+TWITTER ACCOUNT:
+Intern619
+vg4l7xhjfh
