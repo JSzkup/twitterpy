@@ -35,6 +35,7 @@ def login_twitter(driver):
 
     # open the web page in the browser:
     driver.get("https://twitter.com/explore")
+    WebDriverWait(driver,1)
  
     return
 
@@ -63,9 +64,9 @@ def search_twitter(driver, keywords):
     # initial wait for the search results to load
     wait = WebDriverWait(driver, 10)
  
-    #TODO click the LATEST tab to get the recent most tweets talking about the keywords
-    driver.find_element_by_xpath("//*[@id=\"react-root\"]/div/div/div[2]/header/div[2]/div[1]/div[2]/nav/div[2]/div[2]/a/div").click()
-    driver.wait = WebDriverWait(driver, 5) 
+    # clicks on "Latest" tab to scrub through the most recent tweets
+    driver.find_element_by_link_text("Latest").click()
+    driver.wait = WebDriverWait(driver, 1) 
 
     try:
         # wait until the first search result is found. Search results will be tweets, which are html list items and have the class='data-item-id'
@@ -110,12 +111,12 @@ def extract_tweets(page_source):
     for li in soup.find_all("li", class_='js-stream-item'):
  
         # If our li doesn't have a tweet-id, we skip it as it's not going to be a tweet.
-        if 'data-testid=\"tweet\"' not in li.attrs:
+        if 'data-item-id' not in li.attrs:
             continue
  
         else:
             tweet = {
-                'tweet_id': li['data-testid=\"tweet\"'],
+                'tweet_id': li['data-item-id'],
                 'text': None,
                 'user_id': None,
                 'user_screen_name': None,
