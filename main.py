@@ -68,6 +68,9 @@ def search_twitter(driver, keywords):
     driver.find_element_by_link_text("Latest").click()
     driver.wait = WebDriverWait(driver, 1) 
 
+
+    #TODO try .find_element_by_link_text(KEYWORDSINPUTTEDBYUSER)
+
     try:
         # wait until the first search result is found. Search results will be tweets, which are html list items and have the class='data-item-id'
         wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "[aria-label=\"Timeline: Search timeline\"]")))
@@ -76,7 +79,9 @@ def search_twitter(driver, keywords):
         while True:
  
             # extract all the tweets
-            tweets = driver.find_elements_by_css_selector("li[data-item-id]")
+            tweets = driver.find_elements_by_css_selector("article[role='article']")
+
+            print(tweets)
  
             # find number of visible tweets
             number_of_tweets = len(tweets)
@@ -87,7 +92,7 @@ def search_twitter(driver, keywords):
             try:
                 # wait for more tweets to be visible
                 wait.until(WaitForMoreThanNElementsToBePresent(
-                    (By.CSS_SELECTOR, "li[data-item-id]"), number_of_tweets))
+                    (By.CSS_SELECTOR, "article[role='article']"), number_of_tweets))
  
             except TimeoutException:
                 # if no more are visible the "wait.until" call will timeout. Catch the exception and exit the while loop
