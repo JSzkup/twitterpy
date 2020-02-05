@@ -8,6 +8,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+# error handling
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import StaleElementReferenceException
 
@@ -15,10 +16,11 @@ from selenium.common.exceptions import StaleElementReferenceException
 from bs4 import BeautifulSoup as bs
 
 # pause program so it doesnt work faster than the driver can update
+# Twitter bot etiquette states you should have at least 1 second in between requests
 import time
 import datetime
 
-# ordering info
+# organizing info
 import numpy
 import pandas
 
@@ -69,8 +71,6 @@ def search_twitter(driver, keywords):
     driver.wait = WebDriverWait(driver, 1) 
 
 
-    #TODO try .find_element_by_link_text(KEYWORDSINPUTTEDBYUSER)
-
     try:
         # wait until the first search result is found. Search results will be tweets, which are html list items and have the class='data-item-id'
         wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "[aria-label=\"Timeline: Search timeline\"]")))
@@ -81,13 +81,17 @@ def search_twitter(driver, keywords):
             # extract all the tweets
             tweets = driver.find_elements_by_css_selector("article[role='article']")
 
-            print(tweets)
+            #print tweets to
+            for i in tweets:
+                print(i.text)
+                print("\n\n")
  
             # find number of visible tweets
             number_of_tweets = len(tweets)
  
             # keep scrolling
             driver.execute_script("arguments[0].scrollIntoView(true);", tweets[-1])
+            driver.implicitly_wait(1)
  
             try:
                 # wait for more tweets to be visible
@@ -104,7 +108,7 @@ def search_twitter(driver, keywords):
     except TimeoutException:
  
         # if there are no search results then the "wait.until" call in the first "try" statement will never happen and it will time out. So we catch that exception and return no html
-        pageSource=None #TODO Throws errors at bs4 when NONE
+        pageSource=None
  
     return pageSource
 
@@ -180,7 +184,8 @@ if __name__ == "__main__":
     # log in to twitter (replace username/password with your own)
     login_twitter(driver)
  
-    # What is written in the twitter searchbar TODO look into advanced search
+    # What is written in the twitter searchbar 
+    # TODO look into advanced search
     keywords = "Suffolk County"
     pageSource = search_twitter(driver, keywords)
  
