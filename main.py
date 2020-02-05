@@ -128,28 +128,19 @@ class Tweet(object):
 
 def parse_tweets(tweets):
     
-    parsedText = []
+    #TODO account for non english characters, different fonts, and emojis sanitize
 
-    #for i in tweets:
-    #    text = i.text
+    parsedTweets = []
+
+
+
+
+    for i in tweets:
+
+         re.split("^[A-Za-z0-9_-]{,15}NEWLINE[@A-Za-z0-9_-]{,15}$  ", i.text) #(RE.MULTILINE?)
  
-
-
-
-
-        ##tweet = {
-        ##    'tweet_id': li['data-item-id'],
-        ##    'text': None,
-        ##    'user_id': None,
-        ##    'user_screen_name': None,
-        ##    'user_name': None,
-        ##    'created_at': None,
-        ##    'retweets': 0,
-        ##    'likes': 0,
-        ##    'replies': 0
-        ##}
  
-    return parsedText
+    return parsedTweets
 
 
 def close_driver(driver):
@@ -168,6 +159,8 @@ if __name__ == "__main__":
     keywords = "Suffolk County"
     search_twitter(driver, keywords)
 
+    # TODO create an actual limit to how many tweets arepulled/can be pulled
+    # grabs the tweets from the twitter search
     tweets = pull_tweets(driver)
  
     # extract info from the search results
@@ -178,8 +171,3 @@ if __name__ == "__main__":
     close_driver(driver)
 
 
-""" 
-Might be a better Idea to use scrapy or Tweepy with the Twitter API
-Tweepy would make pulling info from tweets easier but I need API keys
-scrapy would make organizing the data after scraping easier
-"""
