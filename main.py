@@ -28,8 +28,8 @@ import datetime
 import re
 
 def init_driver():
-    #Chrome 79
-    driver = webdriver.Chrome(r'C:\PythonFiles\TwitterScraper\chromedriver.exe')
+    # opens automated version of chrome
+    driver = webdriver.Chrome(r'C:\PythonFiles\TwitterScraper\chromedriver.exe') #Chrome 79
     driver.wait = WebDriverWait(driver, 5) 
 
     return driver
@@ -40,7 +40,7 @@ def login_twitter(driver):
 
     # open the web page in the browser:
     driver.get("https://twitter.com/explore")
-    WebDriverWait(driver,1)
+    driver.wait = WebDriverWait(driver,1)
  
     return
 
@@ -87,17 +87,21 @@ def pull_tweets(driver):
             # extract all the tweets
             tweets = driver.find_elements_by_css_selector("article[role='article']")
 
-            #print tweets to
-            for i in tweets:
-                print(i.text)
-                print("\n\n")
+            # # print tweets to console
+            # for i in tweets:
+            #     print(i.text)
+            #     print("\n\n")
  
             # find number of visible tweets
             number_of_tweets = len(tweets)
  
-            # keep scrolling
+            #TODO limit scrolling to x amount of pages/tweets
+            #TODO stops automatically when tweets are found faster than the page can update
+            # scroll after finding a set of tweets so the next set appears
             driver.execute_script("arguments[0].scrollIntoView(true);", tweets[-1])
-            driver.implicitly_wait(1)
+            # Twitter kindly asks to wait at least a second between requests
+            time.sleep(1)
+            #driver.implicitly_wait(1)
  
             try:
                 # wait for more tweets to be visible
@@ -117,7 +121,7 @@ def pull_tweets(driver):
 
 class Tweet(object):
     def __init__(self, tweet_id, tweet_name, tweet_handle, text, comments, retweets, likes):
-        self.tweet_id = ""
+        self.tweet_id = "" # tweet.id
         self.tweet_name = ""
         self.tweet_handle = ""
         self.text = ""
@@ -126,21 +130,23 @@ class Tweet(object):
         self.likes = 0
 
 
-def parse_tweets(tweets):
+def parse_tweets(tweets): #TODO Tweet Object wont pass into function
     
     #TODO account for non english characters, different fonts, and emojis sanitize
 
-    parsedTweets = []
-
-
+    splitTweets = []
+    parsedTweets = Tweet()
 
 
     for i in tweets:
+        SplitTweets = i.text.splitlines()
 
-         re.split("^[A-Za-z0-9_-]{,15}NEWLINE[@A-Za-z0-9_-]{,15}$  ", i.text) #(RE.MULTILINE?)
+        splitTweets[0] = parsedTweets.tweet_name()
+        splitTweets[1] = parsedTweets.tweet_handle()
+            
  
  
-    return parsedTweets
+    return #parsedTweets
 
 
 def close_driver(driver):
@@ -156,7 +162,7 @@ if __name__ == "__main__":
  
     # What is written in the twitter searchbar 
     # TODO look into advanced search
-    keywords = "Suffolk County"
+    keywords = "suffolk County"
     search_twitter(driver, keywords)
 
     # TODO create an actual limit to how many tweets arepulled/can be pulled

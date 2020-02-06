@@ -13,10 +13,37 @@ tweet4 = 'Builder of stuff\n@JohnDillworth\n·\n25m\nReplying to \n@LIRR\nSince 
 tweet5 = 'Jobs Ipswich\n@JobsIpswich1\n·\n28m\nProgramme Co-ordinator – Suffolk County Council – Ipswich\nProgramme Co-ordinator – Suffolk County Council – Ipswich\nThis organisation positively encourages the use of technology to communicate and engage, but in this role you will need to operate across a wide and rural [...]\nalljobsintheuk.eu'
 
 
-splitReg = re.split(r"^([A-Za-z0-9_-]{,15}<username>)\n(@[A-Za-z0-9_-]{,15}<handle>)\n([0-9K|M]?<age>)\n([A-Za-z0-9_-]{,280}<text>)  $", tweet1)
+# #TODO is it @ + 15 chars?
+# 
+# splitReg = re.split(r"^([A-Za-z0-9 +]{,50}<username>)\n(^@[A-Za-z0-9_-]{,16}<handle>)\n([0-9K|M]?<age>)\n([A-Za-z0-9_-]{,280}<text>)  $", tweet1)
+# 
+# for i in splitReg:
+#     print(i)
 
+splitReg = re.compile(r"^([A-Za-z0-9 +]{,50}<username>)\n(^@[A-Za-z0-9_-]{,16}<handle>)\n([0-9K|M]?<age>)\n([A-Za-z0-9_-]{,280}<text>", re.MULTILINE)
+print(re.findall(splitReg, tweet1))
+
+tweet = tweet3.splitlines()
+
+for i in tweet:
+    print(i)
+
+##print("")
+##print("")
+##
+##print("[", end = '')
+##print(*tweet, sep = ", ", end = '')  
+##print("]", end = '')
+##
+##print("")
+##print("")
+##
+##print(tweet[0])
 
 # https://stackoverflow.com/questions/28856238/how-to-get-group-name-of-match-regular-expression-in-python
+# https://stackoverflow.com/questions/36817785/different-way-to-specify-matching-new-line-in-python-regex?rq=1
+# https://stackoverflow.com/questions/36807039/regular-expression-pattern-match-newline-and-tab-in-python
+
 #TODO might have to compile re.compile first
 #print(splitReg.groupindex)
 
