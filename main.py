@@ -39,7 +39,7 @@ def login_twitter(driver):
     #TODO Look into https://twitter.com/search-advanced / Making a UI for these inputs specifically
 
     # open the web page in the browser:
-    driver.get("https://twitter.com/explore")
+    driver.get("https://twitter.com/search-advanced")
     driver.wait = WebDriverWait(driver,1)
  
     return
@@ -57,20 +57,58 @@ class WaitForMoreThanNElementsToBePresent(object):
         except selenium.common.exceptions.StaleElementReferenceException:
             return False
 
-def search_twitter(driver, keywords):
- 
-    box = driver.wait.until(EC.presence_of_element_located((By.XPATH, "//*[@id=\"react-root\"]/div/div/div[2]/header/div[2]/div[1]/div[1]/div/div[2]/div/div/div/form/div[1]/div/div/div[2]/input")))
-    driver.find_element_by_xpath("//*[@id=\"react-root\"]/div/div/div[2]/header/div[2]/div[1]/div[1]/div/div[2]/div/div/div/form/div[1]/div/div/div[2]/input").clear()
-    # your typed keywords is typed in
-    box.send_keys(keywords)
+def search_twitter(driver):
+    #waits until the presence of the first text box before continuing
+    box = driver.wait.until(EC.presence_of_element_located((By.NAME, "allOfTheseWords")))
+    #driver.find_element_by_xpath("//*[@id=\"react-root\"]/div/div/div[2]/header/div[2]/div[1]/div[1]/div/div[2]/div/div/div/form/div[1]/div/div/div[2]/input")
+    
+    # Example: what’s happening · contains both “what’s” and “happening”
+    all_these_words = driver.find_element_by_name("allOfTheseWords").clear()
+    print("All of These words")
+    allW = input()
+    all_these_words.send_keys(allW)
+
+    # Example: happy hour · contains the exact phrase “happy hour”
+    exact_phrase = driver.find_element_by_xpath("//*[@id=\"react-root\"]/div/div/div/main/div/div/div[2]/div/div/div[2]/div[2]/div/label/div[2]/div/input").clear()
+    print("This Exact Phrase")
+    exactW = input()
+    exact_phrase.send_keys(exactW)
+
+    # Example: cats dogs · contains either “cats” or “dogs” (or both)
+    any_words = driver.find_element_by_xpath("//*[@id=\"react-root\"]/div/div/div/main/div/div/div[2]/div/div/div[2]/div[3]/div/label/div[2]/div/input").clear()
+    print("Any of these words")
+    anyW = input()
+    any_words.send_keys(anyW)
+
+    # Example: cats dogs · does not contain “cats” and does not contain “dogs”
+    none_words = driver.find_element_by_xpath("//*[@id=\"react-root\"]/div/div/div/main/div/div/div[2]/div/div/div[2]/div[4]/div/label/div[2]/div/input").clear()
+    print("None of these Words")
+    noneW = input()
+    none_words.send_keys(noneW)
+
+    # Example: #ThrowbackThursday · contains the hashtag #ThrowbackThursday
+    hashtags = driver.find_element_by_xpath("//*[@id=\"react-root\"]/div/div/div/main/div/div/div[2]/div/div/div[2]/div[5]/div/label/div[2]/div/input").clear()
+    print("These hashtags (#)")
+    hashW = input()
+    hashtags.send_keys(hashW)
+
+    # Example: @SFBART @Caltrain · mentions @SFBART or mentions @Caltrain
+    mentioning = driver.find_element_by_xpath("//*[@id=\"react-root\"]/div/div/div/main/div/div/div[2]/div/div/div[5]/div[3]/div/label/div[2]/div/input").clear()
+    print("Mentioning these accounts (@)")
+    mentW = input()
+    mentioning.send_keys(mentW)
+
+    #TODO date selection    
+    
+    # "Entre" key is hit on the first searchbox to star a search
     box.submit()
 
     # initial wait for the search results to load
     driver.implicitly_wait(1)
  
-    # clicks "Latest" tab to get most recent tweets
-    driver.find_element_by_link_text("Latest").click()
-    driver.wait = WebDriverWait(driver, 1) 
+    # # clicks "Latest" tab to get most recent tweets
+    # driver.find_element_by_link_text("Latest").click()
+    # driver.wait = WebDriverWait(driver, 1) 
 
     return
 
@@ -135,14 +173,14 @@ def parse_tweets(tweets): #TODO Tweet Object wont pass into function
     #TODO account for non english characters, different fonts, and emojis sanitize
 
     splitTweets = []
-    parsedTweets = Tweet()
-
-
-    for i in tweets:
-        SplitTweets = i.text.splitlines()
-
-        splitTweets[0] = parsedTweets.tweet_name()
-        splitTweets[1] = parsedTweets.tweet_handle()
+    #parsedTweets = Tweet()
+#
+#
+    #for i in tweets:
+    #    SplitTweets = i.text.splitlines()
+#
+    #    splitTweets[0] = parsedTweets.tweet_name()
+    #    splitTweets[1] = parsedTweets.tweet_handle()
             
  
  
@@ -160,10 +198,8 @@ if __name__ == "__main__":
     # log in to twitter (replace username/password with your own)
     login_twitter(driver)
  
-    # What is written in the twitter searchbar 
-    # TODO look into advanced search
-    keywords = "suffolk County"
-    search_twitter(driver, keywords)
+    # the advanced search to be performed
+    search_twitter(driver)
 
     # TODO create an actual limit to how many tweets arepulled/can be pulled
     # grabs the tweets from the twitter search
