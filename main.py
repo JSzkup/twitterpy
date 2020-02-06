@@ -67,36 +67,42 @@ def search_twitter(driver):
     print("All of These words")
     allW = input()
     all_these_words.send_keys(allW)
+    print("")
 
     # Example: happy hour · contains the exact phrase “happy hour”
-    exact_phrase = driver.find_element_by_xpath("//*[@id=\"react-root\"]/div/div/div/main/div/div/div[2]/div/div/div[2]/div[2]/div/label/div[2]/div/input").clear()
+    exact_phrase = driver.find_element_by_name("thisExactPhrase").clear()
     print("This Exact Phrase")
     exactW = input()
     exact_phrase.send_keys(exactW)
+    print("")
 
     # Example: cats dogs · contains either “cats” or “dogs” (or both)
-    any_words = driver.find_element_by_xpath("//*[@id=\"react-root\"]/div/div/div/main/div/div/div[2]/div/div/div[2]/div[3]/div/label/div[2]/div/input").clear()
+    any_words = driver.find_element_by_name("anyOfTheseWords").clear()
     print("Any of these words")
     anyW = input()
     any_words.send_keys(anyW)
+    print("")
 
     # Example: cats dogs · does not contain “cats” and does not contain “dogs”
-    none_words = driver.find_element_by_xpath("//*[@id=\"react-root\"]/div/div/div/main/div/div/div[2]/div/div/div[2]/div[4]/div/label/div[2]/div/input").clear()
+    none_words = driver.find_element_by_name("noneOfTheseWords").clear()
     print("None of these Words")
     noneW = input()
     none_words.send_keys(noneW)
+    print("")
 
     # Example: #ThrowbackThursday · contains the hashtag #ThrowbackThursday
-    hashtags = driver.find_element_by_xpath("//*[@id=\"react-root\"]/div/div/div/main/div/div/div[2]/div/div/div[2]/div[5]/div/label/div[2]/div/input").clear()
-    print("These hashtags (#)")
+    hashtags = driver.find_element_by_name("theseHashtags").clear()
+    print("These hashtags (starts with #)")
     hashW = input()
     hashtags.send_keys(hashW)
+    print("")
 
     # Example: @SFBART @Caltrain · mentions @SFBART or mentions @Caltrain
-    mentioning = driver.find_element_by_xpath("//*[@id=\"react-root\"]/div/div/div/main/div/div/div[2]/div/div/div[5]/div[3]/div/label/div[2]/div/input").clear()
-    print("Mentioning these accounts (@)")
+    mentioning = driver.find_element_by_name("mentioningTheseAccounts").clear()
+    print("Mentioning these accounts (starts with @)")
     mentW = input()
     mentioning.send_keys(mentW)
+    print("")
 
     #TODO date selection    
     
