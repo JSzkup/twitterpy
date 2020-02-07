@@ -73,6 +73,11 @@ def query():
 
     for i in search_query:
         print(i)
+
+    result = [" "] * (len(search_query) * 2 - 1)
+    result[0::2] = search_query
+
+    print(str(result))
     
     return search_query
 
@@ -107,21 +112,20 @@ class WaitForMoreThanNElementsToBePresent(object):
 
 #TODO create own queries instead of using twitters advanced search tool
 # geocode:45.523452,-122.676207,10km
-def search_twitter(driver, search):
-    #TODO old but might be useful https://thinkdisaster.com/2013/07/01/using-advanced-twitter-search-helpful-for-smartphone-and-tablet-searches/
-
-    # waits until the presence of the first text box before continuing    
-    wait = WebDriverWait(driver, 10)
-
-    time.sleep(1)
-
+def search_twitter(driver, keywords):
+ 
+    box = driver.wait.until(EC.presence_of_element_located((By.XPATH, "//*[@id=\"react-root\"]/div/div/div[2]/header/div[2]/div[1]/div[1]/div/div[2]/div/div/div/form/div[1]/div/div/div[2]/input")))
+    driver.find_element_by_xpath("//*[@id=\"react-root\"]/div/div/div[2]/header/div[2]/div[1]/div[1]/div/div[2]/div/div/div/form/div[1]/div/div/div[2]/input").clear()
+    # your typed keywords is typed in
+    box.send_keys(keywords)
+    box.submit()
 
     # initial wait for the search results to load
     driver.implicitly_wait(1)
  
-    ## clicks "Latest" tab to get most recent tweets
-    #driver.find_element_by_link_text("Latest").click()
-    #driver.wait = WebDriverWait(driver, 1) 
+    # clicks "Latest" tab to get most recent tweets
+    driver.find_element_by_link_text("Latest").click()
+    driver.wait = WebDriverWait(driver, 1) 
 
     return
 
