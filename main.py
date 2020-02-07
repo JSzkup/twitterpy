@@ -27,6 +27,55 @@ import datetime
 # regular expressions to parse text
 import re
 
+def query():
+
+    search_query = []
+
+    #TODO write all of these into one search bar, formatted to use each one properly to conform with link above
+
+    # Example: what’s happening · contains both “what’s” and “happening”
+    print("All of These words: ", end = '')
+    allW = input()
+    search_query.append(allW)
+    print("")
+
+    # Example: happy hour · contains the exact phrase “happy hour”
+    print("This Exact Phrase: ", end = '')
+    exactW = input()
+    search_query.append("\"" + exactW +"\"")
+    print("")
+
+    # Example: cats dogs · contains either “cats” or “dogs” (or both)
+    print("Any of these words: ", end = '')
+    anyW = input()
+    search_query.append(anyW.replace(" ", " OR "))
+    print("")
+
+    # Example: cats dogs · does not contain “cats” and does not contain “dogs”
+    print("None of these Words: ", end = '')
+    noneW = input()
+    search_query.append("-" + noneW.replace(" ", " -"))
+    print("")
+
+    # Example: #ThrowbackThursday · contains the hashtag #ThrowbackThursday
+    print("These hashtags (starts with #): ", end = '')
+    hashW = input()
+    search_query.append(hashW)
+    print("")
+
+    # Example: @SFBART @Caltrain · mentions @SFBART or mentions @Caltrain
+    print("Mentioning these accounts (starts with @): ", end = '')
+    mentW = input()
+    search_query.append(mentW)
+    print("")
+
+    #TODO date selection    
+
+    for i in search_query:
+        print(i)
+    
+    return search_query
+
 def init_driver():
     # opens automated version of chrome
     driver = webdriver.Chrome(r'C:\PythonFiles\TwitterScraper\chromedriver.exe') #Chrome 79
@@ -37,7 +86,7 @@ def init_driver():
 def login_twitter(driver):
  
     # open the web page in the browser:
-    driver.get("https://twitter.com/search-advanced")
+    driver.get("https://twitter.com/explore")
     driver.wait = WebDriverWait(driver, 1)
  
     return
@@ -58,97 +107,25 @@ class WaitForMoreThanNElementsToBePresent(object):
 
 #TODO create own queries instead of using twitters advanced search tool
 # geocode:45.523452,-122.676207,10km
-def search_twitter(driver):
+def search_twitter(driver, search):
     #TODO old but might be useful https://thinkdisaster.com/2013/07/01/using-advanced-twitter-search-helpful-for-smartphone-and-tablet-searches/
 
     # waits until the presence of the first text box before continuing    
     wait = WebDriverWait(driver, 10)
-    wait.until(EC.presence_of_element_located((By.NAME, "allOfTheseWords")))
 
-
-    ######
-    #TODO write all of these into one search bar, formatted to use each one properly to conform with link above
-    ######
-
-    # Example: what’s happening · contains both “what’s” and “happening”
-    all_these_words = driver.find_element_by_name("allOfTheseWords")
-    print("All of These words")
-    allW = input()
-    # all_these_words.send_keys("cat")
-    print("")
-
-    # Example: happy hour · contains the exact phrase “happy hour”
-    exact_phrase = driver.find_element_by_name("thisExactPhrase")
-    print("This Exact Phrase")
-    exactW = input()
-    exact_phrase.send_keys(exactW)
-    print("")
-
-    # Example: cats dogs · contains either “cats” or “dogs” (or both)
-    any_words = driver.find_element_by_name("anyOfTheseWords")
-    print("Any of these words")
-    anyW = input()
-    any_words.send_keys(anyW)
-    print("")
-
-    # Example: cats dogs · does not contain “cats” and does not contain “dogs”
-    none_words = driver.find_element_by_name("noneOfTheseWords")
-    print("None of these Words")
-    noneW = input()
-    none_words.send_keys(noneW)
-    print("")
-
-    # Example: #ThrowbackThursday · contains the hashtag #ThrowbackThursday
-    hashtags = driver.find_element_by_name("theseHashtags")
-    print("These hashtags (starts with #)")
-    hashW = input()
-    hashtags.send_keys(hashW)
-    print("")
-
-    # Example: @SFBART @Caltrain · mentions @SFBART or mentions @Caltrain
-    mentioning = driver.find_element_by_name("mentioningTheseAccounts")
-    print("Mentioning these accounts (starts with @)")
-    mentW = input()
-    mentioning.send_keys(mentW)
-    print("")
-
-    #TODO date selection    
-    
-
-    #TODO button is inside a form, does this matter?
-    #METHOD1
-    #############################
-    ##html = driver.find_element_by_tag_name('html')
-    ##html.send_keys(Keys.HOME)
-    ##
-    ##time.sleep(1)
-##
-    ##wait.until(EC.presence_of_element_located((By.NAME, "allOfTheseWords")))
-    ##all_these_words.submit
-
-    #METHOD2
-    ##############################
-    # "Search" button is clicked
     time.sleep(1)
-    # wait.until(EC.presence_of_element_located((By.LINK_TEXT, "Search")))
-    #driver.find_element_by_xpath("/html/body/div/div/div/div/main/div/div/div[1]/div/div/div/div[3]/div").click()
-    #driver.find_element_by_link_text("Search").click()
-    
-    #driver.find_element_by_css_selector("div[role='button']").click() # Closes out the iframe
-  
-    ## # wait for search button to appear, then click it
-    ## search = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.LINK_TEXT, "Search")))
-    ## search.click()
+
 
     # initial wait for the search results to load
     driver.implicitly_wait(1)
  
-    ## # clicks "Latest" tab to get most recent tweets
-    ## driver.find_element_by_link_text("Latest").click()
-    ## driver.wait = WebDriverWait(driver, 1) 
+    ## clicks "Latest" tab to get most recent tweets
+    #driver.find_element_by_link_text("Latest").click()
+    #driver.wait = WebDriverWait(driver, 1) 
 
     return
 
+# TODO switch to mobile twitter
 def pull_tweets(driver):
     wait = WebDriverWait(driver, 10)
 
@@ -230,15 +207,18 @@ def close_driver(driver):
     driver.close()
 
 if __name__ == "__main__":
- 
+    # creating the advanced search tool
+    search = query()
+  
     # start a driver for a web browser
     driver = init_driver()
  
     # log in to twitter (replace username/password with your own)
     login_twitter(driver)
+
  
     # the advanced search to be performed
-    search_twitter(driver)
+    search_twitter(driver, search)
 
     # TODO create an actual limit to how many tweets arepulled/can be pulled
     # grabs the tweets from the twitter search
