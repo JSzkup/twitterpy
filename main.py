@@ -173,6 +173,12 @@ def pull_tweets(driver):
  
             # find number of visible tweets
             number_of_tweets = len(tweets)
+
+
+            unparsed = open("Unorganized.txt", "a", encoding='utf-8')
+            for i in tweets:
+                unparsed.writelines("\n" + i.text +  "\n")
+            unparsed.close()
  
             # https://stackoverflow.com/questions/20986631/how-can-i-scroll-a-web-page-using-selenium-webdriver-in-python
             #TODO limit scrolling to x amount of pages/tweets
