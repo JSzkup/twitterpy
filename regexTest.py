@@ -3,25 +3,26 @@ import pandas as pd
 
 #name[letters A-Z, numbers 0-9, underscores] (15 chars) \n username (15 chars) \n · \n age of post (6 chars) \n text (280 chars)[link/hyperlink text might be here] \n video length (4 chars) \n From \nVideos \n comment (5 chars, can contain K or M) \n retweets (5 chars, can contain K or M) \n likes (5 chars, can contain K or M) \n Show this thread'
 
-tweet1 ='Michael Block\n@NYTrafficLaw\n·\n8m\nCheck out my latest article: Speeding Ticket Won In Suffolk County https://linkedin.com/pulse/speeding-ticket-won-suffolk-county-michael-block-esq-… via \n@LinkedIn\nSpeeding Ticket Won In Suffolk County\nWe recently represented a client of ours at the Southampton Town Court in Suffolk County. He was charged with a 6 point speeding ticket.\nlinkedin.com'
-
-tweet2 = 'SC Vanderbilt Museum\n@TheVanderbilt\n·\n9m\nCelebrate the lives of Irish immigrants on March 7 at the Vanderbilt Museum! Members only pre-sale open now! @ Suffolk County Vanderbilt Museum and Planetarium https://instagram.com/p/B8MSBwoHfGv/?igshid=11rry556b5js3…'
-
-tweet3 = "Le' Foogazi Times\n@MasterPhoFooga1\n·\n18m\nReplying to \n@USRoute41\n @GinSecurities\n and \n@NYGovCuomo\nNo Westchester county\nHe just goes to Suffolk as part of the Hampstein crew\n1"
-
-tweet4 = 'Builder of stuff\n@JohnDillworth\n·\n25m\nReplying to \n@LIRR\nSince Babylon is the only express station in Suffolk County and is the connecting point for shuttle trains please share the options for non-resident parking at Babylon. That is a great option for Port Jeff riders so tell us about the extra non-resident parking you secured for us.'
-
-tweet5 = 'Jobs Ipswich\n@JobsIpswich1\n·\n28m\nProgramme Co-ordinator – Suffolk County Council – Ipswich\nProgramme Co-ordinator – Suffolk County Council – Ipswich\nThis organisation positively encourages the use of technology to communicate and engage, but in this role you will need to operate across a wide and rural [...]\nalljobsintheuk.eu'
+#tweet1 ='Michael Block\n@NYTrafficLaw\n·\n8m\nCheck out my latest article: Speeding Ticket Won In Suffolk County https://linkedin.com/pulse/speeding-ticket-won-suffolk-county-michael-block-esq-… via \n@LinkedIn\nSpeeding Ticket Won In Suffolk County\nWe recently represented a client of ours at the Southampton Town Court in Suffolk County. He was charged with a 6 point speeding ticket.\nlinkedin.com'
+#
+#tweet2 = 'SC Vanderbilt Museum\n@TheVanderbilt\n·\n9m\nCelebrate the lives of Irish immigrants on March 7 at the Vanderbilt Museum! Members only pre-sale open now! @ Suffolk County Vanderbilt Museum and Planetarium https://instagram.com/p/B8MSBwoHfGv/?igshid=11rry556b5js3…'
+#
+#tweet3 = "Le' Foogazi Times\n@MasterPhoFooga1\n·\n18m\nReplying to \n@USRoute41\n @GinSecurities\n and \n@NYGovCuomo\nNo Westchester county\nHe just goes to Suffolk as part of the Hampstein crew\n1"
+#
+#tweet4 = 'Builder of stuff\n@JohnDillworth\n·\n25m\nReplying to \n@LIRR\nSince Babylon is the only express station in Suffolk County and is the connecting point for shuttle trains please share the options for non-resident parking at Babylon. That is a great option for Port Jeff riders so tell us about the extra non-resident parking you secured for us.'
+#
+#tweet5 = 'Jobs Ipswich\n@JobsIpswich1\n·\n28m\nProgramme Co-ordinator – Suffolk County Council – Ipswich\nProgramme Co-ordinator – Suffolk County Council – Ipswich\nThis organisation positively encourages the use of technology to communicate and engage, but in this role you will need to operate across a wide and rural [...]\nalljobsintheuk.eu'
 
 
 tweet_dict = {
     "name": re.compile(r'Name = (?P<name>^[a-zA-z0-9 _]{,50})$\n'),
     "username": re.compile(r'Username = (?P<username>^@[a-zA-Z_0-9]{,15})$\n'),
-    #"text": re.compile(r'Text = (?P<text>')
+    #TODO test this in code,  works 9/10 times on regex101
+    #"text": re.compile(r'Text = ((?P<text>^.{,280})\n$'),
 }
 
 
-def _parse_line(line):
+def parse_line(line):
 
     for key, tweet in tweet_dict.items():
         match = tweet.search(line)
@@ -48,11 +49,11 @@ def parse_file(filepath):
 
     data = []  # create an empty list to collect the data
     # open the file and read through it line by line
-    with open(filepath, 'r') as file_object:
+    with open(filepath, 'r', encoding="utf8") as file_object:
         line = file_object.readline()
         while line:
             # at each line check for a match with a regex
-            key, match = _parse_line(line)
+            key, match = parse_line(line)
 
             # extract school name
             if key == 'name':
