@@ -41,55 +41,55 @@ def query():
         search_query.append(" ")
     print("")
 
-    # Example: happy hour · contains the exact phrase “happy hour”
-    print("This Exact Phrase: ", end = '')
-    exactW = input()
-    if exactW == "":
-        pass
-    else:
-        search_query.append("\"" + exactW +"\"")
-        search_query.append(" ")
-    print("")
-
-    # Example: cats dogs · contains either “cats” or “dogs” (or both)
-    print("Any of these words: ", end = '')
-    anyW = input()
-    if anyW == "":
-        pass
-    else:
-        search_query.append(anyW.replace(" ", " OR "))
-        search_query.append(" ")
-    print("")
-
-    # Example: cats dogs · does not contain “cats” and does not contain “dogs”
-    print("None of these Words: ", end = '')
-    noneW = input()
-    if noneW == "":
-        pass
-    else:
-        search_query.append("-" + noneW.replace(" ", " -"))
-        search_query.append(" ")
-    print("")
-
-    # Example: #ThrowbackThursday · contains the hashtag #ThrowbackThursday
-    print("These hashtags (starts with #): ", end = '')
-    hashW = input()
-    if hashW == "":
-        pass
-    else:
-        search_query.append(hashW)
-        search_query.append(" ")
-    print("")
-
-    # Example: @SFBART @Caltrain · mentions @SFBART or mentions @Caltrain
-    print("Mentioning these accounts (starts with @): ", end = '')
-    mentW = input()
-    if mentW == "":
-        pass
-    else:
-        search_query.append(mentW)
-        search_query.append(" ")
-    print("")
+    ### Example: happy hour · contains the exact phrase “happy hour”
+    ##print("This Exact Phrase: ", end = '')
+    ##exactW = input()
+    ##if exactW == "":
+    ##    pass
+    ##else:
+    ##    search_query.append("\"" + exactW +"\"")
+    ##    search_query.append(" ")
+    ##print("")
+##
+    ### Example: cats dogs · contains either “cats” or “dogs” (or both)
+    ##print("Any of these words: ", end = '')
+    ##anyW = input()
+    ##if anyW == "":
+    ##    pass
+    ##else:
+    ##    search_query.append(anyW.replace(" ", " OR "))
+    ##    search_query.append(" ")
+    ##print("")
+##
+    ### Example: cats dogs · does not contain “cats” and does not contain “dogs”
+    ##print("None of these Words: ", end = '')
+    ##noneW = input()
+    ##if noneW == "":
+    ##    pass
+    ##else:
+    ##    search_query.append("-" + noneW.replace(" ", " -"))
+    ##    search_query.append(" ")
+    ##print("")
+##
+    ### Example: #ThrowbackThursday · contains the hashtag #ThrowbackThursday
+    ##print("These hashtags (starts with #): ", end = '')
+    ##hashW = input()
+    ##if hashW == "":
+    ##    pass
+    ##else:
+    ##    search_query.append(hashW)
+    ##    search_query.append(" ")
+    ##print("")
+##
+    ### Example: @SFBART @Caltrain · mentions @SFBART or mentions @Caltrain
+    ##print("Mentioning these accounts (starts with @): ", end = '')
+    ##mentW = input()
+    ##if mentW == "":
+    ##    pass
+    ##else:
+    ##    search_query.append(mentW)
+    ##    search_query.append(" ")
+    ##print("")
 
     #TODO date selection    
 
@@ -166,10 +166,10 @@ def pull_tweets(driver):
             # extract all the tweets
             tweets = driver.find_elements_by_css_selector("article[role='article']")
 
-            # print tweets to console
-            for i in tweets:
-                print(i.text)
-                print("\n\n")
+            ### print tweets to console
+            ##for i in tweets:
+            ##    print(i.text)
+            ##    print("\n\n")
  
             # find number of visible tweets
             number_of_tweets = len(tweets)
@@ -181,6 +181,7 @@ def pull_tweets(driver):
             unparsed.close()
  
             # https://stackoverflow.com/questions/20986631/how-can-i-scroll-a-web-page-using-selenium-webdriver-in-python
+            # https://stackoverflow.com/questions/27003423/staleelementreferenceexception-on-python-selenium
             #TODO limit scrolling to x amount of pages/tweets
             #TODO stops automatically when tweets are found faster than the page can update instead of giving TimeoutException
             # twitter limits scrolling in timeline/favorites to around 3200 tweets
@@ -221,19 +222,17 @@ def parse_tweets(tweets): #TODO Tweet Object wont pass into function
     
     #TODO account for non english characters, different fonts, and emojis sanitize
 
-    splitTweets = []
-    #parsedTweets = Tweet()
-#
-#
-    #for i in tweets:
-    #    SplitTweets = i.text.splitlines()
-#
-    #    splitTweets[0] = parsedTweets.tweet_name()
-    #    splitTweets[1] = parsedTweets.tweet_handle()
+    tweetText = []
+    tweetText = tweets.text
+    splitTweets = (tweetText.splitlines())
+
             
+    parsed = open("Organized.txt", "a", encoding='utf-8')
+    for i in splitTweets:
+        parsed.writelines(i +  "\n") #TODO removed first newline added to i
+    parsed.close()
  
- 
-    return #parsedTweets
+    return splitTweets #TODO make an actual ending function
 
 
 def close_driver(driver):
