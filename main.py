@@ -31,42 +31,64 @@ def query():
 
     search_query = []
 
-    #TODO write all of these into one search bar, formatted to use each one properly to conform with link above
-
     # Example: what’s happening · contains both “what’s” and “happening”
     print("All of These words: ", end = '')
     allW = input()
-    search_query.append(allW)
+    if allW == "":
+        pass
+    else:
+        search_query.append(allW)
+        search_query.append(" ")
     print("")
 
     # Example: happy hour · contains the exact phrase “happy hour”
     print("This Exact Phrase: ", end = '')
     exactW = input()
-    search_query.append("\"" + exactW +"\"")
+    if exactW == "":
+        pass
+    else:
+        search_query.append("\"" + exactW +"\"")
+        search_query.append(" ")
     print("")
 
     # Example: cats dogs · contains either “cats” or “dogs” (or both)
     print("Any of these words: ", end = '')
     anyW = input()
-    search_query.append(anyW.replace(" ", " OR "))
+    if anyW == "":
+        pass
+    else:
+        search_query.append(anyW.replace(" ", " OR "))
+        search_query.append(" ")
     print("")
 
     # Example: cats dogs · does not contain “cats” and does not contain “dogs”
     print("None of these Words: ", end = '')
     noneW = input()
-    search_query.append("-" + noneW.replace(" ", " -"))
+    if noneW == "":
+        pass
+    else:
+        search_query.append("-" + noneW.replace(" ", " -"))
+        search_query.append(" ")
     print("")
 
     # Example: #ThrowbackThursday · contains the hashtag #ThrowbackThursday
     print("These hashtags (starts with #): ", end = '')
     hashW = input()
-    search_query.append(hashW)
+    if hashW == "":
+        pass
+    else:
+        search_query.append(hashW)
+        search_query.append(" ")
     print("")
 
     # Example: @SFBART @Caltrain · mentions @SFBART or mentions @Caltrain
     print("Mentioning these accounts (starts with @): ", end = '')
     mentW = input()
-    search_query.append(mentW)
+    if mentW == "":
+        pass
+    else:
+        search_query.append(mentW)
+        search_query.append(" ")
     print("")
 
     #TODO date selection    
@@ -74,10 +96,11 @@ def query():
     for i in search_query:
         print(i)
 
-    result = [" "] * (len(search_query) * 2 - 1)
-    result[0::2] = search_query
 
-    print(str(result))
+    #result = [" "] * (len(search_query) * 2 - 1)
+    #result[0::2] = search_query
+
+    #print(str(result))
     
     return search_query
 
@@ -143,17 +166,17 @@ def pull_tweets(driver):
             # extract all the tweets
             tweets = driver.find_elements_by_css_selector("article[role='article']")
 
-            # # print tweets to console
-            # for i in tweets:
-            #     print(i.text)
-            #     print("\n\n")
+            # print tweets to console
+            for i in tweets:
+                print(i.text)
+                print("\n\n")
  
             # find number of visible tweets
             number_of_tweets = len(tweets)
  
             # https://stackoverflow.com/questions/20986631/how-can-i-scroll-a-web-page-using-selenium-webdriver-in-python
             #TODO limit scrolling to x amount of pages/tweets
-            #TODO stops automatically when tweets are found faster than the page can update
+            #TODO stops automatically when tweets are found faster than the page can update instead of giving TimeoutException
             # twitter limits scrolling in timeline/favorites to around 3200 tweets
             # scroll after finding a set of tweets so the next set appears
             driver.execute_script("arguments[0].scrollIntoView(true);", tweets[-1])
@@ -220,17 +243,15 @@ if __name__ == "__main__":
     # log in to twitter (replace username/password with your own)
     login_twitter(driver)
 
- 
     # the advanced search to be performed
     search_twitter(driver, search)
 
-    # TODO create an actual limit to how many tweets arepulled/can be pulled
+    # TODO create an actual limit to how many tweets are pulled/can be pulled
     # grabs the tweets from the twitter search
     tweets = pull_tweets(driver)
  
     # extract info from the search results
     finalTweets = parse_tweets(tweets)
-
 
     # close the driver:
     close_driver(driver)
