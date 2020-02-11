@@ -17,10 +17,8 @@ import pandas as pd
 tweet_dict = {
     "name": re.compile(r'Name = (?P<name>^[a-zA-z0-9 _]{,50})$\n'),
     "username": re.compile(r'Username = (?P<username>^@[a-zA-Z_0-9]{,15})$\n'),
-    #TODO test this in code,  works 9/10 times on regex101
-    #"text": re.compile(r'Text = ((?P<text>^.{,280})\n$'),
+    "text": re.compile(r'Text = (?P<username>^(Replying to\n@[a-zA-Z_0-9]{,15})$|(?P<age>\d+(m|h|s)))(?P<text>\n.{,280})\n$'),
 }
-
 
 def parse_line(line):
 
@@ -64,21 +62,20 @@ def parse_file(filepath):
             # extract grade
             if key == 'username':
                 username = match.group('username')
-                #username = int(username)
             else:
                 username = match.group('NO TWITTER USERNAME')
 
+            if key == 'text':
+                text = match.group('text')
+            else:
+                text = match.group('NO TWITTER TEXT')
 
             while line.strip():
-                # extract number and value
-                #number, value = line.strip().split(',')
-                #value = value.strip()
                 # create a dictionary containing this row of data
                 row = {
                     'Name': name,
-                    'Username': username
-                    #'Student number': number,
-                    #value_type: value
+                    'Username': username,
+                    'Text': text
                 }
                 # append the dictionary to the data list
                 data.append(row)
