@@ -17,8 +17,10 @@ import pandas as pd
 tweet_dict = {
     "name": re.compile(r'Name = (?P<name>^[a-zA-z0-9 _]{,50})$\n'),
     "username": re.compile(r'Username = (?P<username>^@[a-zA-Z_0-9]{,15})$\n'),
-    "text": re.compile(r'Text = (?P<username>^(Replying to\n@[a-zA-Z_0-9]{,15})$|(?P<age>\d+(m|h|s)))(?P<text>\n.{,280})\n$'),
+    #TODO does not work 100% of the time yet
+    "text": re.compile(r'Text = ((?P<age>\d(s|m|h|d))|(?P<username>^@[a-zA-Z_0-9]{,15})$|(?P<moreusers>and \d others))(?P<text>\n.{,280})\n$((?P<stats>\d*)|(?P<show>Show this Thread?))'),
 }
+
 
 def parse_line(line):
 
@@ -46,7 +48,7 @@ def parse_file(filepath):
     """
 
     data = []  # create an empty list to collect the data
-    # open the file and read through it line by line
+    # open the file and read through it line by line, specifying UTF-8 for compatibility
     with open(filepath, 'r', encoding="utf8") as file_object:
         line = file_object.readline()
         while line:
@@ -57,18 +59,18 @@ def parse_file(filepath):
             if key == 'name':
                 name = match.group('name')
             else:
-                name = match.group('NO TWITTER NAME')
+                name = ""
 
             # extract grade
             if key == 'username':
                 username = match.group('username')
             else:
-                username = match.group('NO TWITTER USERNAME')
+                username = ""
 
             if key == 'text':
                 text = match.group('text')
             else:
-                text = match.group('NO TWITTER TEXT')
+                text = ""
 
             while line.strip():
                 # create a dictionary containing this row of data
@@ -86,11 +88,12 @@ def parse_file(filepath):
         # create a pandas DataFrame from the list of dicts
         data = pd.DataFrame(data)
         # set the School, Grade, and Student number as the index
-        data.set_index(['name', 'username'], inplace=True)
+        data.set_index(['name', 'username', 'text'], inplace=True)
         # consolidate df to remove nans
         data = data.groupby(level=data.index.names).first()
         # upgrade Score from float to integer
         data = data.apply(pd.to_numeric, errors='ignore')
+
     return data
 
 if __name__ == '__main__':

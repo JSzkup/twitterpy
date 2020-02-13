@@ -174,7 +174,7 @@ def pull_tweets(driver):
             # find number of visible tweets
             number_of_tweets = len(tweets)
 
-
+            # logs tweets somewhat organized, specifying utf-8 for compatibility
             unparsed = open("Unorganized.txt", "a", encoding='utf-8')
             for i in tweets:
                 unparsed.writelines("\n" + i.text +  "\n")
@@ -226,7 +226,7 @@ def parse_tweets(tweets): #TODO Tweet Object wont pass into function
     tweetText = tweets.text
     splitTweets = (tweetText.splitlines())
 
-            
+    
     parsed = open("Organized.txt", "a", encoding='utf-8')
     for i in splitTweets:
         parsed.writelines(i +  "\n") #TODO removed first newline added to i
