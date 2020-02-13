@@ -8,6 +8,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options  
+
 # error handling
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import StaleElementReferenceException
@@ -105,9 +107,11 @@ def query():
     return search_query
 
 def init_driver():
-    # opens automated version of chrome
-    driver = webdriver.Chrome(r'C:\PythonFiles\TwitterScraper\chromedriver.exe') #Chrome 79
-    driver.wait = WebDriverWait(driver, 5) 
+    # opens a headless/invisible automated version of chrome
+    chrome_options = Options()  
+    chrome_options.add_argument("--headless")  
+
+    driver = webdriver.Chrome(executable_path=r'C:\PythonFiles\TwitterScraper\chromedriver.exe', options = chrome_options)  
 
     return driver
 
