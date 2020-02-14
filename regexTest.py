@@ -23,6 +23,16 @@ tweet_dict = {
     "text": re.compile(r'Text = ((?P<age>\d(s|m|h|d))|(?P<username>^@[a-zA-Z_0-9]{,15})$|(?P<moreusers>and \d others))(?P<text>\n.{,280})\n$((?P<stats>\d*)|(?P<show>Show this Thread?))'),
 }
 
+'''
+tweet_dict = {
+    "name": re.compile(r'Name = (?P<name>[a-zA-z0-9 _]{,50})'), #Needs to find the FIRST one per line
+    "username": re.compile(r'Username = (?P<username>@[a-zA-Z_0-9]{,15})'),
+    #TODO does not work 100% of the time yet
+    "text": re.compile(r'Text = (?P<before>(\d(s|m|h|d))|(>@[a-zA-Z_0-9]{,15})|(and \d others))(?P<text>.{,280})'),
+}
+https://regex101.com/r/dNLWOL/1
+'''
+
 # high hit rate low acc
 # ((?P<age>^\d+(s|m|h|d))$|(?P<username>^@[a-zA-Z_0-9]{,15})$|(?P<moreusers>^and \d others$))(?P<text>\n.{,280})$((?P<stats>\d*)|(?P<show>Show this Thread?))
 # low hit rate high acc

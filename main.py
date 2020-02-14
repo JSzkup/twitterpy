@@ -15,7 +15,7 @@ from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import StaleElementReferenceException
 
 # parse HTML tweets
-from bs4 import BeautifulSoup as bs
+import pandas as pd
 
 # pause program so it doesnt work faster than the driver can update
 # Twitter bot etiquette states you should have at least 1 second in between requests
@@ -163,7 +163,7 @@ def pull_tweets(driver):
     # TODO test twitter page xml 
     page_source = driver.page_source
     soup = bs(page_source,'lxml')
-    xmltest = open("xmlTest.xml", "a", encoding='utf-8')
+    xmltest = open("xmlTest.xml", "w", encoding='utf-8')
     xmltest.writelines(str(soup))
     xmltest.close()
     #TODO read lmxl and beautiful soup docs
