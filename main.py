@@ -27,6 +27,9 @@ import datetime
 # regular expressions to parse text
 import re
 
+# Custom search query is entered before the browser starts up
+#TODO geocodes to search for tweets geocode:45.523452,-122.676207,10km
+# https://geocoder.readthedocs.io/
 def query():
 
     search_query = []
@@ -133,8 +136,6 @@ class WaitForMoreThanNElementsToBePresent(object):
             return False
 
 
-#TODO create own queries instead of using twitters advanced search tool
-# geocode:45.523452,-122.676207,10km
 def search_twitter(driver, keywords):
  
     box = driver.wait.until(EC.presence_of_element_located((By.XPATH, "//*[@id=\"react-root\"]/div/div/div[2]/header/div[2]/div[1]/div[1]/div/div[2]/div/div/div/form/div[1]/div/div/div[2]/input")))
@@ -152,9 +153,17 @@ def search_twitter(driver, keywords):
 
     return
 
-# TODO switch to mobile twitter
 def pull_tweets(driver):
     wait = WebDriverWait(driver, 10)
+
+    # TODO test twitter page xml 
+    page_source = driver.page_source
+    soup = bs(page_source,'lxml')
+    xmltest = open("xmlTest.xml", "a", encoding='utf-8')
+    xmltest.writelines(str(soup))
+    xmltest.close()
+    #TODO read lmxl and beautiful soup docs
+    #TODO XSLT transformation
 
     try:
         # wait until the first search result is found. Search results will be tweets, which are html list items and have the class='data-item-id'
@@ -220,8 +229,6 @@ class Tweet(object):
 
 def parse_tweets(tweets): #TODO Tweet Object wont pass into function
     
-    #TODO account for non english characters, different fonts, and emojis sanitize
-
     tweetText = []
     tweetText = tweets.text
     splitTweets = (tweetText.splitlines())

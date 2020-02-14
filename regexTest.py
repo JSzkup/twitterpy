@@ -13,7 +13,9 @@ import pandas as pd
 #
 #tweet5 = 'Jobs Ipswich\n@JobsIpswich1\n·\n28m\nProgramme Co-ordinator – Suffolk County Council – Ipswich\nProgramme Co-ordinator – Suffolk County Council – Ipswich\nThis organisation positively encourages the use of technology to communicate and engage, but in this role you will need to operate across a wide and rural [...]\nalljobsintheuk.eu'
 
-
+#TODO implement this into main.py and use the tweets variable instead of working through Unorganized.txt
+#TODO This way I wont have to work line by line to check search for the user/text just the whole
+#TODO Work on using regex on the unformatted text with \n still included
 tweet_dict = {
     "name": re.compile(r'Name = (?P<name>^[a-zA-z0-9 _]{,50})$\n'),
     "username": re.compile(r'Username = (?P<username>^@[a-zA-Z_0-9]{,15})$\n'),
@@ -21,6 +23,10 @@ tweet_dict = {
     "text": re.compile(r'Text = ((?P<age>\d(s|m|h|d))|(?P<username>^@[a-zA-Z_0-9]{,15})$|(?P<moreusers>and \d others))(?P<text>\n.{,280})\n$((?P<stats>\d*)|(?P<show>Show this Thread?))'),
 }
 
+# high hit rate low acc
+# ((?P<age>^\d+(s|m|h|d))$|(?P<username>^@[a-zA-Z_0-9]{,15})$|(?P<moreusers>^and \d others$))(?P<text>\n.{,280})$((?P<stats>\d*)|(?P<show>Show this Thread?))
+# low hit rate high acc
+# ((?P<age>\d(s|m|h|d))|(?P<username>^@[a-zA-Z_0-9]{,15})$|(?P<moreusers>and \d others))(?P<text>\n.{,280})\n$((?P<stats>\d*)|(?P<show>Show this Thread?))
 
 def parse_line(line):
 
@@ -110,7 +116,4 @@ if __name__ == '__main__':
 # https://stackoverflow.com/questions/28856238/how-to-get-group-name-of-match-regular-expression-in-python
 # https://stackoverflow.com/questions/36817785/different-way-to-specify-matching-new-line-in-python-regex?rq=1
 # https://stackoverflow.com/questions/36807039/regular-expression-pattern-match-newline-and-tab-in-python
-
-#TODO might have to compile re.compile first
-#print(splitReg.groupindex)
 

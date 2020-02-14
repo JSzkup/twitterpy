@@ -2,4 +2,4 @@ Selenium
 Numpy
 Pandas
 lxml
-
+beautifulsoup4

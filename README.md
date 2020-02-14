@@ -1,13 +1,15 @@
 # Reqirements
 
 ## place in the same folder as project, use python os to locate it, or add to PATH
+
 ChromeDriver for the specific version of Chrome you are running
-https://chromedriver.chromium.org/
+<https://chromedriver.chromium.org/>
 
 ## installs required modules
+
 $ pip install -Ur requirements.txt
 
-# If logging into twitter
+## If logging into twitter
 
 **GMAIL ACCOUNT:**
 webdevintern619
