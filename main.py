@@ -17,14 +17,15 @@ from selenium.common.exceptions import StaleElementReferenceException
 # parse HTML tweets
 import pandas as pd
 
+# Read xml
+from bs4 import BeautifulSoup as bs
+
+#TODO recheck requirements.txt and cleanup unused imports
+
 # pause program so it doesnt work faster than the driver can update
 # Twitter bot etiquette states you should have at least 1 second in between requests
 import time
 import datetime
-
-### organizing info
-##import numpy
-##import pandas
 
 # regular expressions to parse text
 import re
@@ -111,10 +112,11 @@ def query():
 
 def init_driver():
     # opens a headless/invisible automated version of chrome
-    chrome_options = Options()  
-    chrome_options.add_argument("--headless")  
+    #TODO temporarily gave Chrome a head again
+    #chrome_options = Options()  
+    #chrome_options.add_argument("--headless")  
 
-    driver = webdriver.Chrome(executable_path=r'C:\PythonFiles\TwitterScraper\chromedriver.exe', options = chrome_options)  
+    driver = webdriver.Chrome(executable_path=r'C:\PythonFiles\TwitterScraper\chromedriver.exe')#, options = chrome_options)  
 
     return driver
 
@@ -142,9 +144,10 @@ class WaitForMoreThanNElementsToBePresent(object):
 
 def search_twitter(driver, keywords):
  
-    box = driver.wait.until(EC.presence_of_element_located((By.XPATH, "//*[@id=\"react-root\"]/div/div/div[2]/header/div[2]/div[1]/div[1]/div/div[2]/div/div/div/form/div[1]/div/div/div[2]/input")))
-    driver.find_element_by_xpath("//*[@id=\"react-root\"]/div/div/div[2]/header/div[2]/div[1]/div[1]/div/div[2]/div/div/div/form/div[1]/div/div/div[2]/input").clear()
-    # your typed keywords is typed in
+    #TODO Twitter changed its searchbox XPATH, check to see what/if has been changed on twitters end
+    box = driver.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[aria-label='Search query']")))
+    driver.find_element_by_css_selector("input[aria-label='Search query']").clear()
+    # your typed keywords is typed in and entered
     box.send_keys(keywords)
     box.submit()
 
@@ -160,14 +163,13 @@ def search_twitter(driver, keywords):
 def pull_tweets(driver):
     wait = WebDriverWait(driver, 10)
 
-    # TODO test twitter page xml 
+    # pulls xml from current opened page
     page_source = driver.page_source
     soup = bs(page_source,'lxml')
+    # writes xml to an xml file in main dir (overwrites itself on run)
     xmltest = open("xmlTest.xml", "w", encoding='utf-8')
     xmltest.writelines(str(soup))
     xmltest.close()
-    #TODO read lmxl and beautiful soup docs
-    #TODO XSLT transformation
 
     try:
         # wait until the first search result is found. Search results will be tweets, which are html list items and have the class='data-item-id'
@@ -187,11 +189,56 @@ def pull_tweets(driver):
             # find number of visible tweets
             number_of_tweets = len(tweets)
 
-            # logs tweets somewhat organized, specifying utf-8 for compatibility
-            unparsed = open("Unorganized.txt", "a", encoding='utf-8')
-            for i in tweets:
-                unparsed.writelines("\n" + i.text +  "\n")
-            unparsed.close()
+            #TODO add the rest of Regextest Here or in another function for clarity
+
+            #key, match = parse_tweets(tweets)
+
+            data = pd.DataFrame()
+
+            #TODO for i in tweets, i.text
+            while tweets.text:
+                # at each line check for a match with a regex
+                key, match = parse_tweets(tweets)
+
+                # extract school name
+                if key == 'name':
+                    name = match.group('name')
+                else:
+                    name = ""
+
+                # extract grade
+                if key == 'username':
+                    username = match.group('username')
+                else:
+                    username = ""
+
+                # extract body text
+                if key == 'text':
+                    text = match.group('text')
+                else:
+                    text = ""
+
+                while tweets.text.strip():
+                    # create a dictionary containing this row of data
+                    row = {
+                        'Name': name,
+                        'Username': username,
+                        'Text': text
+                    }
+                    # append the dictionary to the data list
+                    data.append(row)
+                    line = file_object.readline()
+
+            line = file_object.readline()
+
+            # create a pandas DataFrame from the list of dicts
+            data = pd.DataFrame(data)
+            # set the School, Grade, and Student number as the index
+            data.set_index(['name', 'username', 'text'], inplace=True)
+            # consolidate df to remove nans
+            data = data.groupby(level=data.index.names).first()
+            # upgrade Score from float to integer
+            data = data.apply(pd.to_numeric, errors='ignore')
  
             # https://stackoverflow.com/questions/20986631/how-can-i-scroll-a-web-page-using-selenium-webdriver-in-python
             # https://stackoverflow.com/questions/27003423/staleelementreferenceexception-on-python-selenium
@@ -217,34 +264,26 @@ def pull_tweets(driver):
  
         # if there are no search results then the "wait.until" call in the first "try" statement will never happen and it will time out. So we catch that exception and return no html
         tweets = None
+
+    #TODO create an sql db for storing tweets (mySQL / NoSQL / MongoDB)
  
     return tweets
 
-class Tweet(object):
-    def __init__(self, tweet_id, tweet_name, tweet_handle, text, comments, retweets, likes):
-        self.tweet_id = "" # tweet.id
-        self.tweet_name = ""
-        self.tweet_handle = ""
-        self.text = ""
-        self.comments = 0
-        self.retweets = 0
-        self.likes = 0
-
-
-def parse_tweets(tweets): #TODO Tweet Object wont pass into function
+#TODO part of the loop when finding the tweets should be parsing it piece by piece, then storing it somewhere LOG/DATABASE
+def parse_tweets(tweets):
     
-    tweetText = []
-    tweetText = tweets.text
-    splitTweets = (tweetText.splitlines())
+    tweet_dict = {
+        "name": re.compile(r'Name = (?P<name>[a-zA-z0-9 _]{,50})'), # Needs to find the FIRST one per line
+        "username": re.compile(r'Username = (?P<username>@[a-zA-Z_0-9]{,15})'),
+        "text": re.compile(r'Text = (?P<before>(\d(s|m|h|d))|(>@[a-zA-Z_0-9]{,15})|(and \d others))(?P<text>.{,280})'),
+    }
 
-    
-    parsed = open("Organized.txt", "a", encoding='utf-8')
-    for i in splitTweets:
-        parsed.writelines(i +  "\n") #TODO removed first newline added to i
-    parsed.close()
- 
-    return splitTweets #TODO make an actual ending function
-
+    for key, pattern in tweet_dict.items():
+        match = pattern.search(tweets.text)
+        if match:
+            return key, match
+    # if there are no matches
+    return None, None
 
 def close_driver(driver):
     driver.close()
