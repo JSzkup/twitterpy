@@ -16,20 +16,20 @@ import pandas as pd
 #TODO implement this into main.py and use the tweets variable instead of working through Unorganized.txt
 #TODO This way I wont have to work line by line to check search for the user/text just the whole
 #TODO Work on using regex on the unformatted text with \n still included
+'''
 tweet_dict = {
     "name": re.compile(r'Name = (?P<name>^[a-zA-z0-9 _]{,50})$\n'),
     "username": re.compile(r'Username = (?P<username>^@[a-zA-Z_0-9]{,15})$\n'),
     "text": re.compile(r'Text = ((?P<age>\d(s|m|h|d))|(?P<username>^@[a-zA-Z_0-9]{,15})$|(?P<moreusers>and \d others))(?P<text>\n.{,280})\n$((?P<stats>\d*)|(?P<show>Show this Thread?))'),
 }
-
 '''
+#TODO test this regex with the current unorganized.txt
 tweet_dict = {
-    "name": re.compile(r'Name = (?P<name>[a-zA-z0-9 _]{,50})'), #Needs to find the FIRST one per line
-    "username": re.compile(r'Username = (?P<username>@[a-zA-Z_0-9]{,15})'),
-    "text": re.compile(r'Text = (?P<before>(\d(s|m|h|d))|(>@[a-zA-Z_0-9]{,15})|(and \d others))(?P<text>.{,280})'),
+    "name": re.compile(r'(?P<name>[a-zA-z0-9 _]{,50})'), #Needs to find the FIRST one per line
+    "username": re.compile(r'(?P<username>@[a-zA-Z_0-9]{,15})'),
+    "text": re.compile(r'(?P<before>(\d(s|m|h|d))|(>@[a-zA-Z_0-9]{,15})|(and \d others))(?P<text>.{,280})'),
 }
-https://regex101.com/r/dNLWOL/2
-'''
+
 
 # high hit rate low acc
 # ((?P<age>^\d+(s|m|h|d))$|(?P<username>^@[a-zA-Z_0-9]{,15})$|(?P<moreusers>^and \d others$))(?P<text>\n.{,280})$((?P<stats>\d*)|(?P<show>Show this Thread?))
@@ -101,8 +101,8 @@ def parse_file(filepath):
 
         # create a pandas DataFrame from the list of dicts
         data = pd.DataFrame(data)
-        # set the School, Grade, and Student number as the index
-        data.set_index(['name', 'username', 'text'], inplace=True)
+        # set the name, username, and text as the index
+        data.set_index(['Name', 'Username', 'Text'], inplace=True)
         # consolidate df to remove nans
         data = data.groupby(level=data.index.names).first()
         # upgrade Score from float to integer

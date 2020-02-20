@@ -196,45 +196,61 @@ def pull_tweets(driver):
             data = pd.DataFrame()
 
             #TODO for i in tweets, i.text
-            while tweets.text:
-                # at each line check for a match with a regex
-                key, match = parse_tweets(tweets)
 
-                # extract school name
-                if key == 'name':
-                    name = match.group('name')
-                else:
-                    name = ""
-
-                # extract grade
-                if key == 'username':
-                    username = match.group('username')
-                else:
-                    username = ""
-
-                # extract body text
-                if key == 'text':
-                    text = match.group('text')
-                else:
-                    text = ""
-
-                while tweets.text.strip():
-                    # create a dictionary containing this row of data
-                    row = {
-                        'Name': name,
-                        'Username': username,
-                        'Text': text
+            for i in tweets:
+                while i.text:
+                    # at each line check for a match with a regex
+                    tweet_dict = {
+                        "name": re.compile(r'Name = (?P<name>[a-zA-z0-9 _]{,50})'), # Needs to find the FIRST one per line
+                        "username": re.compile(r'Username = (?P<username>@[a-zA-Z_0-9]{,15})'),
+                        "text": re.compile(r'Text = (?P<before>(\d(s|m|h|d))|(>@[a-zA-Z_0-9]{,15})|(and \d others))(?P<text>.{,280})'),
                     }
-                    # append the dictionary to the data list
-                    data.append(row)
-                    line = file_object.readline()
 
-            line = file_object.readline()
+                    for i in tweets:
+                        for key, pattern in tweet_dict.items():
+                            match = pattern.search(i.text)
+                            if match:
+                                key, match = parse_tweets(i.text)
+                        # if there are no matches
+                        key, match = None, None
+
+                    #key, match = parse_tweets(i.text)
+
+                    # extract school name
+                    if key == 'name':
+                        name = match.group('name')
+                    else:
+                        name = ""
+
+                    # extract grade
+                    if key == 'username':
+                        username = match.group('username')
+                    else:
+                        username = ""
+
+                    # extract body text
+                    if key == 'text':
+                        text = match.group('text')
+                    else:
+                        text = ""
+
+                    while i.text.strip():
+                        # create a dictionary containing this row of data
+                        row = {
+                            'Name': name,
+                            'Username': username,
+                            'Text': text
+                        }
+                        # append the dictionary to the data list
+                        data.append(row, ignore_index=True)
+                        #line = file_object.readline()
+
+            #line = file_object.readline()
 
             # create a pandas DataFrame from the list of dicts
             data = pd.DataFrame(data)
             # set the School, Grade, and Student number as the index
-            data.set_index(['name', 'username', 'text'], inplace=True)
+            data.set_index(['Name', 'Username', 'Text'], inplace=True)
             # consolidate df to remove nans
             data = data.groupby(level=data.index.names).first()
             # upgrade Score from float to integer
@@ -278,12 +294,13 @@ def parse_tweets(tweets):
         "text": re.compile(r'Text = (?P<before>(\d(s|m|h|d))|(>@[a-zA-Z_0-9]{,15})|(and \d others))(?P<text>.{,280})'),
     }
 
-    for key, pattern in tweet_dict.items():
-        match = pattern.search(tweets.text)
-        if match:
-            return key, match
-    # if there are no matches
-    return None, None
+    for i in tweets:
+        for key, pattern in tweet_dict.items():
+            match = pattern.search(i.text)
+            if match:
+                return key, match
+        # if there are no matches
+        return None, None
 
 def close_driver(driver):
     driver.close()
