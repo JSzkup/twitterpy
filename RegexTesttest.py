@@ -11,8 +11,10 @@ tweet_dict = {
 for i in tweets:
     for key, tweet in tweet_dict.items():
         match = tweet.search(i)
+        match = match.group(0)
         if match:
-            print(f"Key: {key} \n Match: {match}")
+            print(f"{key.upper()}: {match}")
         else:
-            print ("NO MATCHES")
+            print (f"NO {key.upper()}")
+    print("")
 
