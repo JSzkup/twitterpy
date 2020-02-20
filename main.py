@@ -220,27 +220,46 @@ def pull_tweets(driver, regex):
  
     return tweets
 
-#TODO create a tweet object and have parse tweets create a new object instance per tweet then add name/use/text to it
-class Tweets(object):
-    def __init__(self):
+class TweetObject:
+    def __init__(self, name, username, text):
         self.name = ""
         self.username = ""
         self.text = ""
 
-def parse_tweets(tweets, regexDict):
+def parse_tweets(unparsedtweet, regexDict):
     
     # Separates each part of a tweet and putting them into respective variables
     for key, tweet in regexDict.items():
-        match = tweet.search(tweets)
+        match = tweet.search(unparsedtweet)
         match = match.group(0)
+        #TODO text only shows the timecode (1m) instead of the actual text
+        #TODO check .group(0), should pull the whole text but only pulls the beginning
         if match:
             print(f"{key.upper()}: {match}")
-            #TODO return statements pull you out of the function before username/text is checked for 
-            return key, match
+            if key == 'name':
+                name = match
+            elif key == 'username':
+                username = match
+            elif key == 'text':
+                text = match
         else:
             print (f"{key.upper()}: NO {key.upper()}")
-            return key, None
+            if key == 'name':
+                name = "NO NAME"
+            elif key == 'username':
+                username = "NO USERNAME"
+            elif key == 'text':
+                text = "NO TEXT"
+
+    finalTweet = TweetObject(name, username, text)
+
+    print (finalTweet.name)
+    print (finalTweet.username)
+    print (finalTweet.text)
     print("")
+
+    return finalTweet
+
 
 def close_driver(driver):
     # closes chrome web browser
