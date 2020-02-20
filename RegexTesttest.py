@@ -15,6 +15,7 @@ for i in tweets:
         if match:
             print(f"{key.upper()}: {match}")
         else:
-            print (f"NO {key.upper()}")
+            print (f"{key.upper()}: NO {key.upper()}")
     print("")
 
+#TODO name[:-2] gets rid of trailing \n
