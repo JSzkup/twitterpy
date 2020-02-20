@@ -14,12 +14,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import StaleElementReferenceException
 
-# parse HTML tweets
-import pandas as pd
-
-# Read xml
-from bs4 import BeautifulSoup as bs
-
 #TODO implement TKinter for writing search terms and selecting whether or not to use the latest search terms/geolocation
 
 #TODO recheck requirements.txt and cleanup unused imports
@@ -103,12 +97,6 @@ def query():
 
     for i in search_query:
         print(i)
-
-
-    #result = [" "] * (len(search_query) * 2 - 1)
-    #result[0::2] = search_query
-
-    #print(str(result))
     
     return search_query
 
@@ -121,6 +109,17 @@ def init_driver():
     driver = webdriver.Chrome(executable_path=r'C:\PythonFiles\TwitterScraper\chromedriver.exe')#, options = chrome_options)  
 
     return driver
+
+def init_regex():
+    # compiling regex query early, once for optimization
+    regex = {
+        "name": re.compile(r'(?P<name>[a-zA-z0-9 _.]{,50})'), #Needs to find the FIRST one per line
+        "username": re.compile(r'(?P<username>@[a-zA-Z_0-9]{,15})'),
+        "text": re.compile(r'(?P<before>(\d(s|m|h|d))|(>@[a-zA-Z_0-9]{,15})|(and \d others))(?P<text>.{,280})'),
+    }
+    # https://stackoverflow.com/questions/41805522/can-a-python-dictionary-use-re-compile-as-a-key
+
+    return regex
 
 def login_twitter(driver):
  
@@ -146,7 +145,7 @@ class WaitForMoreThanNElementsToBePresent(object):
 
 def search_twitter(driver, keywords):
  
-    #TODO Twitter changed its searchbox XPATH, check to see what/if has been changed on twitters end
+    # checks for the presence of the search box before typing in search query
     box = driver.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[aria-label='Search query']")))
     driver.find_element_by_css_selector("input[aria-label='Search query']").clear()
     # your typed keywords is typed in and entered
@@ -162,16 +161,8 @@ def search_twitter(driver, keywords):
 
     return
 
-def pull_tweets(driver):
+def pull_tweets(driver, regex):
     wait = WebDriverWait(driver, 10)
-
-    # pulls xml from current opened page
-    page_source = driver.page_source
-    soup = bs(page_source,'lxml')
-    # writes xml to an xml file in main dir (overwrites itself on run)
-    xmltest = open("xmlTest.xml", "w", encoding='utf-8')
-    xmltest.writelines(str(soup))
-    xmltest.close()
 
     try:
         # wait until the first search result is found. Search results will be tweets, which are html list items and have the class='data-item-id'
@@ -196,7 +187,9 @@ def pull_tweets(driver):
             #key, match = parse_tweets(tweets)
 
             for i in tweets:
-                parse_tweets(i.text)
+                parse_tweets(i.text, regex)
+
+                #TODO store the tweets/tweet objects somewhere within this loop
  
             # https://stackoverflow.com/questions/20986631/how-can-i-scroll-a-web-page-using-selenium-webdriver-in-python
             # https://stackoverflow.com/questions/27003423/staleelementreferenceexception-on-python-selenium
@@ -205,9 +198,9 @@ def pull_tweets(driver):
             # twitter limits scrolling in timeline/favorites to around 3200 tweets
             # scroll after finding a set of tweets so the next set appears
             driver.execute_script("arguments[0].scrollIntoView(true);", tweets[-1])
-            # Twitter kindly asks to wait at least a second between requests
+
+            # waiting a second to adhere to twitters bot rules
             time.sleep(1)
-            #driver.implicitly_wait(1)
  
             try:
                 # wait for more tweets to be visible
@@ -228,22 +221,21 @@ def pull_tweets(driver):
     return tweets
 
 #TODO create a tweet object and have parse tweets create a new object instance per tweet then add name/use/text to it
+class Tweets(object):
+    def __init__(self):
+        self.name = ""
+        self.username = ""
+        self.text = ""
 
-
-#TODO part of the loop when finding the tweets should be parsing it piece by piece, then storing it somewhere LOG/DATABASE
-def parse_tweets(tweets):
+def parse_tweets(tweets, regexDict):
     
-    tweet_dict = {
-        "name": re.compile(r'(?P<name>[a-zA-z0-9 _.]{,50})'), #Needs to find the FIRST one per line
-        "username": re.compile(r'(?P<username>@[a-zA-Z_0-9]{,15})'),
-        "text": re.compile(r'(?P<before>(\d(s|m|h|d))|(>@[a-zA-Z_0-9]{,15})|(and \d others))(?P<text>.{,280})'),
-    }
-
-    for key, tweet in tweet_dict.items():
+    # Separates each part of a tweet and putting them into respective variables
+    for key, tweet in regexDict.items():
         match = tweet.search(tweets)
         match = match.group(0)
         if match:
             print(f"{key.upper()}: {match}")
+            #TODO return statements pull you out of the function before username/text is checked for 
             return key, match
         else:
             print (f"{key.upper()}: NO {key.upper()}")
@@ -251,14 +243,16 @@ def parse_tweets(tweets):
     print("")
 
 def close_driver(driver):
+    # closes chrome web browser
     driver.close()
 
 if __name__ == "__main__":
     # creating the advanced search tool
     search = query()
   
-    # start a driver for a web browser
+    # start a driver for a web browser/compiles regex for parsing tweets
     driver = init_driver()
+    regex = init_regex()
  
     # log in to twitter (replace username/password with your own)
     login_twitter(driver)
@@ -268,10 +262,7 @@ if __name__ == "__main__":
 
     # TODO create an actual limit to how many tweets are pulled/can be pulled
     # grabs the tweets from the twitter search
-    tweets = pull_tweets(driver)
- 
-    # extract info from the search results
-    finalTweets = parse_tweets(tweets)
+    tweets = pull_tweets(driver, regex)
 
     # close the driver:
     close_driver(driver)

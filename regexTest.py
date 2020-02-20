@@ -46,20 +46,6 @@ def parse_line(line):
     return None, None
 
 def parse_file(filepath):
-    """
-    Parse text at given filepath
-
-    Parameters
-    ----------
-    filepath : str
-        Filepath for file_object to be parsed
-
-    Returns
-    -------
-    data : pd.DataFrame
-        Parsed data
-
-    """
 
     data = []  # create an empty list to collect the data
     # open the file and read through it line by line, specifying UTF-8 for compatibility
