@@ -16,8 +16,6 @@ from selenium.common.exceptions import StaleElementReferenceException
 
 #TODO implement TKinter for writing search terms and selecting whether or not to use the latest search terms/geolocation
 
-#TODO recheck requirements.txt and cleanup unused imports
-
 # pause program so it doesnt work faster than the driver can update
 # Twitter bot etiquette states you should have at least 1 second in between requests
 import time
@@ -103,10 +101,10 @@ def query():
 def init_driver():
     # opens a headless/invisible automated version of chrome
     #TODO temporarily gave Chrome a head again
-    #chrome_options = Options()  
-    #chrome_options.add_argument("--headless")  
+    chrome_options = Options()  
+    chrome_options.add_argument("--headless")  
 
-    driver = webdriver.Chrome(executable_path=r'C:\PythonFiles\TwitterScraper\chromedriver.exe')#, options = chrome_options)  
+    driver = webdriver.Chrome(executable_path=r'C:\PythonFiles\TwitterScraper\chromedriver.exe', options = chrome_options)  
 
     return driver
 
@@ -115,7 +113,8 @@ def init_regex():
     regex = {
         "name": re.compile(r'(?P<name>[a-zA-z0-9 _.]{,50})'), #Needs to find the FIRST one per line
         "username": re.compile(r'(?P<username>@[a-zA-Z_0-9]{,15})'),
-        "text": re.compile(r'(?P<before>(\d(s|m|h|d))|(>@[a-zA-Z_0-9]{,15})|(and \d others))(?P<text>.{,280})'),
+        #TODO works with (?s) for no apparent reason, gives a deprecation warning, tweets are supposed to only be 280 chars +- handles/usernames (but not hashtags)
+        "text": re.compile(r'((?P<before>(\d(s|m|h|d))|(>@[a-zA-Z_0-9]{,15})|(and \d others))(?P<text>(?s).{,500}))')
     }
     # https://stackoverflow.com/questions/41805522/can-a-python-dictionary-use-re-compile-as-a-key
 
@@ -182,8 +181,6 @@ def pull_tweets(driver, regex):
             # find number of visible tweets
             number_of_tweets = len(tweets)
 
-            #TODO add the rest of Regextest Here or in another function for clarity
-
             #key, match = parse_tweets(tweets)
 
             for i in tweets:
@@ -227,11 +224,18 @@ class TweetObject:
         self.text = ""
 
 def parse_tweets(unparsedtweet, regexDict):
+
+    f = open("Unorganized.txt", "a", encoding="utf-8", newline='')
+    f.write(unparsedtweet.replace("\n", "\\n"))
+    f.write("\n")
+    f.close()
     
     # Separates each part of a tweet and putting them into respective variables
     for key, tweet in regexDict.items():
         match = tweet.search(unparsedtweet)
+        #TODO .groups() PLURAL pulls up everyhting, but not the text
         match = match.group(0)
+            
         #TODO text only shows the timecode (1m) instead of the actual text
         #TODO check .group(0), should pull the whole text but only pulls the beginning
         if match:
