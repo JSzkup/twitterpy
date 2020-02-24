@@ -14,6 +14,9 @@ from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import StaleElementReferenceException
 
+# lets you search twitter by entered location
+import geocoder
+
 #TODO implement TKinter for writing search terms and selecting whether or not to use the latest search terms/geolocation
 
 # pause program so it doesnt work faster than the driver can update
@@ -25,11 +28,23 @@ import datetime
 import re
 
 # Custom search query is entered before the browser starts up
-#TODO geocodes to search for tweets geocode:45.523452,-122.676207,10km
 # https://geocoder.readthedocs.io/
 def query():
 
     search_query = []
+
+    #TODO add a try/catch for when the program cannot access the internet
+    # Example: geocode:45.523452,-122.676207,10km
+    # Open Street Map used for geolocation https://operations.osmfoundation.org/policies/nominatim/
+    print("In this Location ('Mountain View, CA'): ", end = '')
+    area = input()
+    geoLoc = geocoder.osm(area)
+    if geoLoc == "":
+        pass
+    else:
+        search_query.append("geocode:" + str(geoLoc.lat) + "," + str(geoLoc.lng) + ",138km,") # 138km is the length of suffolk county
+        search_query.append(" ")
+    print("")
 
     # Example: what’s happening · contains both “what’s” and “happening”
     print("All of These words: ", end = '')
@@ -91,6 +106,25 @@ def query():
     ##    search_query.append(" ")
     ##print("")
 
+    # Example: “since:yyyy-mm-dd” “until:yyyy-mm-dd”
+    print("Since, Until these dates (either or both) ", end = '')
+    print("Since this date (yyyy-mm-dd): ", end = '')
+    since = input()
+    print("Until this date (yyyy-mm-dd): ", end = '')
+    until = input()
+    if since == "":
+        pass
+    elif until == "":
+        pass
+    else:
+        if since:
+            search_query.append("since:" + since)
+        elif until:
+            search_query.append("until:" + until)
+    search_query.append(" ")
+    print("")
+
+
     #TODO date selection    
 
     for i in search_query:
@@ -100,11 +134,11 @@ def query():
 
 def init_driver():
     # opens a headless/invisible automated version of chrome
-    #TODO temporarily gave Chrome a head again
-    chrome_options = Options()  
-    chrome_options.add_argument("--headless")  
+    #TODO Headless Chrome off for debugging
+    #chrome_options = Options()  
+    #chrome_options.add_argument("--headless")  
 
-    driver = webdriver.Chrome(executable_path=r'C:\PythonFiles\TwitterScraper\chromedriver.exe', options = chrome_options)  
+    driver = webdriver.Chrome(executable_path=r'C:\PythonFiles\TwitterScraper\chromedriver.exe')#, options = chrome_options)  
 
     return driver
 
