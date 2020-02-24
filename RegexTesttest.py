@@ -17,5 +17,3 @@ for i in tweets:
         else:
             print (f"{key.upper()}: NO {key.upper()}")
     print("")
-
-#TODO name[:-2] gets rid of trailing \n

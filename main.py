@@ -33,18 +33,17 @@ def query():
 
     search_query = []
 
-    #TODO add a try/catch for when the program cannot access the internet
-    # Example: geocode:45.523452,-122.676207,10km
-    # Open Street Map used for geolocation https://operations.osmfoundation.org/policies/nominatim/
-    print("In this Location ('Mountain View, CA'): ", end = '')
-    area = input()
-    geoLoc = geocoder.osm(area)
-    if geoLoc == "":
-        pass
-    else:
-        search_query.append("geocode:" + str(geoLoc.lat) + "," + str(geoLoc.lng) + ",138km,") # 138km is the length of suffolk county
-        search_query.append(" ")
-    print("")
+    ### Example: geocode:45.523452,-122.676207,10km
+    ### Open Street Map used for geolocation https://operations.osmfoundation.org/policies/nominatim/
+    ##print("In this Location ('Mountain View, CA'): ", end = '')
+    ##area = input()
+    ##geoLoc = geocoder.osm(area)
+    ##if geoLoc == "":
+    ##    pass
+    ##else:
+    ##    search_query.append("geocode:" + str(geoLoc.lat) + "," + str(geoLoc.lng) + ",138km,") # 138km is the length of suffolk county
+    ##    search_query.append(" ")
+    ##print("")
 
     # Example: what’s happening · contains both “what’s” and “happening”
     print("All of These words: ", end = '')
@@ -106,26 +105,23 @@ def query():
     ##    search_query.append(" ")
     ##print("")
 
-    # Example: “since:yyyy-mm-dd” “until:yyyy-mm-dd”
-    print("Since, Until these dates (either or both) ", end = '')
-    print("Since this date (yyyy-mm-dd): ", end = '')
-    since = input()
-    print("Until this date (yyyy-mm-dd): ", end = '')
-    until = input()
-    if since == "":
-        pass
-    elif until == "":
-        pass
-    else:
-        if since:
-            search_query.append("since:" + since)
-        elif until:
-            search_query.append("until:" + until)
-    search_query.append(" ")
-    print("")
-
-
-    #TODO date selection    
+    ### Example: “since:yyyy-mm-dd” “until:yyyy-mm-dd”
+    ##print("Since, Until these dates (either or both) ", end = '')
+    ##print("Since this date (yyyy-mm-dd): ", end = '')
+    ##since = input()
+    ##print("Until this date (yyyy-mm-dd): ", end = '')
+    ##until = input()
+    ##if since == "":
+    ##    pass
+    ##elif until == "":
+    ##    pass
+    ##else:
+    ##    if since:
+    ##        search_query.append("since:" + since)
+    ##    elif until:
+    ##        search_query.append("until:" + until)
+    ##search_query.append(" ")
+    ##print("")
 
     for i in search_query:
         print(i)
@@ -231,7 +227,7 @@ def pull_tweets(driver, regex):
             driver.execute_script("arguments[0].scrollIntoView(true);", tweets[-1])
 
             # waiting a second to adhere to twitters bot rules
-            time.sleep(1)
+            time.sleep(2)
  
             try:
                 # wait for more tweets to be visible
@@ -246,8 +242,6 @@ def pull_tweets(driver, regex):
  
         # if there are no search results then the "wait.until" call in the first "try" statement will never happen and it will time out. So we catch that exception and return no html
         tweets = None
-
-    #TODO create an sql db for storing tweets (mySQL / NoSQL / MongoDB)
  
     return tweets
 
@@ -267,11 +261,8 @@ def parse_tweets(unparsedtweet, regexDict):
     # Separates each part of a tweet and putting them into respective variables
     for key, tweet in regexDict.items():
         match = tweet.search(unparsedtweet)
-        #TODO .groups() PLURAL pulls up everyhting, but not the text
         match = match.group(0)
             
-        #TODO text only shows the timecode (1m) instead of the actual text
-        #TODO check .group(0), should pull the whole text but only pulls the beginning
         if match:
             print(f"{key.upper()}: {match}")
             if key == 'name':
