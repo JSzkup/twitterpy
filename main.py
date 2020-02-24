@@ -4,20 +4,19 @@
 # import selenium for use with Chrome automation
 import selenium
 from selenium import webdriver
+# inputting keyboard keys into chrome
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
+# chrome wait for element, change chrome options
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options  
-
 # error handling
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import StaleElementReferenceException
 
 # lets you search twitter by entered location
 import geocoder
-
-#TODO implement TKinter for writing search terms and selecting whether or not to use the latest search terms/geolocation
 
 # pause program so it doesnt work faster than the driver can update
 # Twitter bot etiquette states you should have at least 1 second in between requests
