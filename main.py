@@ -18,6 +18,11 @@ from selenium.common.exceptions import StaleElementReferenceException
 # lets you search twitter by entered location
 import geocoder
 
+# GUI creation
+from tkinter import *
+#TODO https://www.reddit.com/r/learnpython/comments/6tw5ve/tkinter_entry_box_how_to_declare_a_light_grey/
+#TODO https://stackoverflow.com/questions/30491721/how-to-insert-a-temporary-text-in-a-tkinter-entry-widget/39677021#39677021
+
 # pause program so it doesnt work faster than the driver can update
 # Twitter bot etiquette states you should have at least 1 second in between requests
 import time
@@ -26,11 +31,103 @@ import datetime
 # regular expressions to parse text
 import re
 
-# Custom search query is entered before the browser starts up
-# https://geocoder.readthedocs.io/
+def visual_search(root):
+    #TODO display where things are beingsearched visually
+    geoLabel = Label(root, text="Search Using GeoLocation:")
+    #TODO put a greyed out example in the text box
+    geoInput = Entry(root, width=40)
+    geoEnter = Button(root, text="Enter", padx=10, pady=2)
+
+
+    geoLabel.grid(row=0, column=0)
+    geoInput.grid(row=1, column=0, columnspan=2)
+    geoEnter.grid(row=1, column=2)
+
+    allLabel = Label(root, text="All of these words:")
+    allInput = Entry(root, width=40)
+    allEnter = Button(root, text="Enter", padx=10, pady=2)
+
+    allLabel.grid(row=2, column=0)
+    allInput.grid(row=3, column=0, columnspan=2)
+    allEnter.grid(row=3, column=2)
+
+    exactLabel = Label(root, text="Exactly this phrase:")
+    exactInput = Entry(root, width=40)
+    exactEnter = Button(root, text="Enter", padx=10, pady=2)
+
+    exactLabel.grid(row=4, column=0)
+    exactInput.grid(row=5, column=0, columnspan=2)
+    exactEnter.grid(row=5, column=2)
+
+    orLabel = Label(root, text="Any of these words:")
+    orInput = Entry(root, width=40)
+    orEnter = Button(root, text="Enter", padx=10, pady=2)
+
+    orLabel.grid(row=6, column=0)
+    orInput.grid(row=7, column=0, columnspan=2)
+    orEnter.grid(row=7, column=2)
+
+    notLabel = Label(root, text="None of these words:")
+    notInput = Entry(root, width=40)
+    notEnter = Button(root, text="Enter", padx=10, pady=2)
+
+    notLabel.grid(row=8, column=0)
+    notInput.grid(row=9, column=0, columnspan=2)
+    notEnter.grid(row=9, column=2)
+
+    hashLabel = Label(root, text="These hashtags (starts with #):")
+    hashInput = Entry(root, width=40)
+    hashEnter = Button(root, text="Enter", padx=10, pady=2)
+
+    hashLabel.grid(row=10, column=0)
+    hashInput.grid(row=11, column=0, columnspan=2)
+    hashEnter.grid(row=11, column=2)
+
+    hashLabel = Label(root, text="These hashtags:")
+    hashInput = Entry(root, width=40)
+    hashEnter = Button(root, text="Enter", padx=10, pady=2)
+
+    hashLabel.grid(row=12, column=0)
+    hashInput.grid(row=13, column=0, columnspan=2)
+    hashEnter.grid(row=13, column=2)
+
+    mentLabel = Label(root, text="Mentioning these accounts (starts with @):")
+    mentInput = Entry(root, width=40)
+    mentEnter = Button(root, text="Enter", padx=10, pady=2)
+
+    mentLabel.grid(row=14, column=0)
+    mentInput.grid(row=15, column=0, columnspan=2)
+    mentEnter.grid(row=15, column=2)
+
+    #TODO tkcalendar might work here instead of text input
+    sincLabel = Label(root, text="Since this date:")
+    sincInput = Entry(root, width=40)
+    sincEnter = Button(root, text="Enter", padx=10, pady=2)
+
+    sincLabel.grid(row=16, column=0)
+    sincInput.grid(row=17, column=0, columnspan=2)
+    sincEnter.grid(row=17, column=2)
+
+    untLabel = Label(root, text="Until this date:")
+    untInput = Entry(root, width=40)
+    untEnter = Button(root, text="Enter", padx=10, pady=2)
+
+    untLabel.grid(row=18, column=0)
+    untInput.grid(row=19, column=0, columnspan=2)
+    untEnter.grid(row=19, column=2)
+
+    latLabel = Label(root, text="Check for the latest tweets:")
+    latButton = Button(root, text="Latest", padx=10, pady=5)
+
+    latLabel.grid(row=20, column=0)
+    latButton.grid(row=20, column=1)
+
+
 def query():
 
     search_query = []
+
+    #TODO break all the search inputs into different functions for use in the GUI
 
     ### Example: geocode:45.523452,-122.676207,10km
     ### Open Street Map used for geolocation https://operations.osmfoundation.org/policies/nominatim/
@@ -294,6 +391,11 @@ def close_driver(driver):
     driver.close()
 
 if __name__ == "__main__":
+    #TODO gui creation here
+    # initializing Gui
+    root = Tk()
+    visual_search(root)
+
     # creating the advanced search tool
     search = query()
   
@@ -314,4 +416,4 @@ if __name__ == "__main__":
     # close the driver:
     close_driver(driver)
 
-
+    root.mainloop()
