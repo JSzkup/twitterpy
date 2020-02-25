@@ -32,12 +32,17 @@ import datetime
 import re
 
 def visual_search(root):
-    #TODO display where things are beingsearched visually
-    geoLabel = Label(root, text="Search Using GeoLocation:")
-    #TODO put a greyed out example in the text box
-    geoInput = Entry(root, width=40)
-    geoEnter = Button(root, text="Enter", padx=10, pady=2)
 
+    search_query = []
+
+    #TODO display the location where things are beings earched visually
+    geoLabel = Label(root, text="In this Location (\"Mountain View, CA\"): ")
+    #TODO put a greyed out example in the text box
+    #TODO https://stackoverflow.com/questions/51781651/showing-a-greyed-out-default-text-in-a-tk-entry
+    #TODO https://stackoverflow.com/questions/30491721/how-to-insert-a-temporary-text-in-a-tkinter-entry-widget/39677021#39677021
+    geoInput = Entry(root, width=40)
+    #TODO et the user decide how far from the point selected they are searching
+    geoEnter = Button(root, text="Enter", padx=10, pady=2)
 
     geoLabel.grid(row=0, column=0)
     geoInput.grid(row=1, column=0, columnspan=2)
@@ -122,106 +127,6 @@ def visual_search(root):
     latLabel.grid(row=20, column=0)
     latButton.grid(row=20, column=1)
 
-
-def query():
-
-    search_query = []
-
-    #TODO break all the search inputs into different functions for use in the GUI
-
-    ### Example: geocode:45.523452,-122.676207,10km
-    ### Open Street Map used for geolocation https://operations.osmfoundation.org/policies/nominatim/
-    ##print("In this Location ('Mountain View, CA'): ", end = '')
-    ##area = input()
-    ##geoLoc = geocoder.osm(area)
-    ##if geoLoc == "":
-    ##    pass
-    ##else:
-    ##    search_query.append("geocode:" + str(geoLoc.lat) + "," + str(geoLoc.lng) + ",138km,") # 138km is the length of suffolk county
-    ##    search_query.append(" ")
-    ##print("")
-
-    # Example: what’s happening · contains both “what’s” and “happening”
-    print("All of These words: ", end = '')
-    allW = input()
-    if allW == "":
-        pass
-    else:
-        search_query.append(allW)
-        search_query.append(" ")
-    print("")
-
-    ### Example: happy hour · contains the exact phrase “happy hour”
-    ##print("This Exact Phrase: ", end = '')
-    ##exactW = input()
-    ##if exactW == "":
-    ##    pass
-    ##else:
-    ##    search_query.append("\"" + exactW +"\"")
-    ##    search_query.append(" ")
-    ##print("")
-##
-    ### Example: cats dogs · contains either “cats” or “dogs” (or both)
-    ##print("Any of these words: ", end = '')
-    ##anyW = input()
-    ##if anyW == "":
-    ##    pass
-    ##else:
-    ##    search_query.append(anyW.replace(" ", " OR "))
-    ##    search_query.append(" ")
-    ##print("")
-##
-    ### Example: cats dogs · does not contain “cats” and does not contain “dogs”
-    ##print("None of these Words: ", end = '')
-    ##noneW = input()
-    ##if noneW == "":
-    ##    pass
-    ##else:
-    ##    search_query.append("-" + noneW.replace(" ", " -"))
-    ##    search_query.append(" ")
-    ##print("")
-##
-    ### Example: #ThrowbackThursday · contains the hashtag #ThrowbackThursday
-    ##print("These hashtags (starts with #): ", end = '')
-    ##hashW = input()
-    ##if hashW == "":
-    ##    pass
-    ##else:
-    ##    search_query.append(hashW)
-    ##    search_query.append(" ")
-    ##print("")
-##
-    ### Example: @SFBART @Caltrain · mentions @SFBART or mentions @Caltrain
-    ##print("Mentioning these accounts (starts with @): ", end = '')
-    ##mentW = input()
-    ##if mentW == "":
-    ##    pass
-    ##else:
-    ##    search_query.append(mentW)
-    ##    search_query.append(" ")
-    ##print("")
-
-    ### Example: “since:yyyy-mm-dd” “until:yyyy-mm-dd”
-    ##print("Since, Until these dates (either or both) ", end = '')
-    ##print("Since this date (yyyy-mm-dd): ", end = '')
-    ##since = input()
-    ##print("Until this date (yyyy-mm-dd): ", end = '')
-    ##until = input()
-    ##if since == "":
-    ##    pass
-    ##elif until == "":
-    ##    pass
-    ##else:
-    ##    if since:
-    ##        search_query.append("since:" + since)
-    ##    elif until:
-    ##        search_query.append("until:" + until)
-    ##search_query.append(" ")
-    ##print("")
-
-    for i in search_query:
-        print(i)
-    
     return search_query
 
 def init_driver():
@@ -390,14 +295,91 @@ def close_driver(driver):
     # closes chrome web browser
     driver.close()
 
+def geo_search(location):
+    # Example: geocode:45.523452,-122.676207,10km
+    # Open Street Map used for geolocation https://operations.osmfoundation.org/policies/nominatim/
+    geoLoc = geocoder.osm(location)
+    if geoLoc == "":
+        pass
+    else:
+        geoLoc = ("geocode:" + str(geoLoc.lat) + "," + str(geoLoc.lng) + ",138km,") # 138km is the length of suffolk county
+        #TODO spaces must be appended search_query.append(" ")
+
+    return geoLoc
+
+def all_search(allW):
+    # Example: what’s happening · contains both “what’s” and “happening”
+    if allW == "":
+        pass
+    
+    return allW
+
+def exact_search(exactW):
+    # Example: happy hour · contains the exact phrase “happy hour”
+    if exactW == "":
+        pass
+    else:
+        exactW = ("\"" + exactW +"\"")
+    
+    return exactW
+
+def any_search(anyW):
+    # Example: cats dogs · contains either “cats” or “dogs” (or both)
+    if anyW == "":
+        pass
+    else:
+        anyW = (anyW.replace(" ", " OR "))
+
+    return anyW
+
+def none_search(noneW):
+    # Example: cats dogs · does not contain “cats” and does not contain “dogs”
+    if noneW == "":
+        pass
+    else:
+        noneW = ("-" + noneW.replace(" ", " -"))
+
+    return noneW
+
+def hash_search(hashW):
+    # Example: #ThrowbackThursday · contains the hashtag #ThrowbackThursday
+    if hashW == "":
+        pass
+
+    #TODO if the typed word has no hashtag, add one
+
+    return hashW
+
+def ment_search(mentW):
+    # Example: @SFBART @Caltrain · mentions @SFBART or mentions @Caltrain
+    if mentW == "":
+        pass
+
+    return mentW
+
+def date_search(since, until):
+    # Example: “since:yyyy-mm-dd” “until:yyyy-mm-dd”
+    if since == "":
+        pass
+    elif until == "":
+        pass
+    else:
+        if since:
+            since = ("since:" + since)
+        elif until:
+            until = ("until:" + until)
+
+    return since, until
+
+
 if __name__ == "__main__":
     #TODO gui creation here
     # initializing Gui
     root = Tk()
-    visual_search(root)
 
-    # creating the advanced search tool
-    search = query()
+    #TODO append each returned thing to a search query list with spaces in between each query
+    #TODO search query into string
+    search = visual_search(root)
   
     # start a driver for a web browser/compiles regex for parsing tweets
     driver = init_driver()
