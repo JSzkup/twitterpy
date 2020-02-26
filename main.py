@@ -20,8 +20,7 @@ import geocoder
 
 # GUI creation
 from tkinter import *
-#TODO https://www.reddit.com/r/learnpython/comments/6tw5ve/tkinter_entry_box_how_to_declare_a_light_grey/
-#TODO https://stackoverflow.com/questions/30491721/how-to-insert-a-temporary-text-in-a-tkinter-entry-widget/39677021#39677021
+from tkcalendar import Calendar, DateEntry
 
 # pause program so it doesnt work faster than the driver can update
 # Twitter bot etiquette states you should have at least 1 second in between requests
@@ -30,104 +29,6 @@ import datetime
 
 # regular expressions to parse text
 import re
-
-def visual_search(root):
-
-    search_query = []
-
-    #TODO display the location where things are beings earched visually
-    geoLabel = Label(root, text="In this Location (\"Mountain View, CA\"): ")
-    #TODO put a greyed out example in the text box
-    #TODO https://stackoverflow.com/questions/51781651/showing-a-greyed-out-default-text-in-a-tk-entry
-    #TODO https://stackoverflow.com/questions/30491721/how-to-insert-a-temporary-text-in-a-tkinter-entry-widget/39677021#39677021
-    geoInput = Entry(root, width=40)
-    #TODO et the user decide how far from the point selected they are searching
-    geoEnter = Button(root, text="Enter", padx=10, pady=2)
-
-    geoLabel.grid(row=0, column=0)
-    geoInput.grid(row=1, column=0, columnspan=2)
-    geoEnter.grid(row=1, column=2)
-
-    allLabel = Label(root, text="All of these words:")
-    allInput = Entry(root, width=40)
-    allEnter = Button(root, text="Enter", padx=10, pady=2)
-
-    allLabel.grid(row=2, column=0)
-    allInput.grid(row=3, column=0, columnspan=2)
-    allEnter.grid(row=3, column=2)
-
-    exactLabel = Label(root, text="Exactly this phrase:")
-    exactInput = Entry(root, width=40)
-    exactEnter = Button(root, text="Enter", padx=10, pady=2)
-
-    exactLabel.grid(row=4, column=0)
-    exactInput.grid(row=5, column=0, columnspan=2)
-    exactEnter.grid(row=5, column=2)
-
-    orLabel = Label(root, text="Any of these words:")
-    orInput = Entry(root, width=40)
-    orEnter = Button(root, text="Enter", padx=10, pady=2)
-
-    orLabel.grid(row=6, column=0)
-    orInput.grid(row=7, column=0, columnspan=2)
-    orEnter.grid(row=7, column=2)
-
-    notLabel = Label(root, text="None of these words:")
-    notInput = Entry(root, width=40)
-    notEnter = Button(root, text="Enter", padx=10, pady=2)
-
-    notLabel.grid(row=8, column=0)
-    notInput.grid(row=9, column=0, columnspan=2)
-    notEnter.grid(row=9, column=2)
-
-    hashLabel = Label(root, text="These hashtags (starts with #):")
-    hashInput = Entry(root, width=40)
-    hashEnter = Button(root, text="Enter", padx=10, pady=2)
-
-    hashLabel.grid(row=10, column=0)
-    hashInput.grid(row=11, column=0, columnspan=2)
-    hashEnter.grid(row=11, column=2)
-
-    hashLabel = Label(root, text="These hashtags:")
-    hashInput = Entry(root, width=40)
-    hashEnter = Button(root, text="Enter", padx=10, pady=2)
-
-    hashLabel.grid(row=12, column=0)
-    hashInput.grid(row=13, column=0, columnspan=2)
-    hashEnter.grid(row=13, column=2)
-
-    mentLabel = Label(root, text="Mentioning these accounts (starts with @):")
-    mentInput = Entry(root, width=40)
-    mentEnter = Button(root, text="Enter", padx=10, pady=2)
-
-    mentLabel.grid(row=14, column=0)
-    mentInput.grid(row=15, column=0, columnspan=2)
-    mentEnter.grid(row=15, column=2)
-
-    #TODO tkcalendar might work here instead of text input
-    sincLabel = Label(root, text="Since this date:")
-    sincInput = Entry(root, width=40)
-    sincEnter = Button(root, text="Enter", padx=10, pady=2)
-
-    sincLabel.grid(row=16, column=0)
-    sincInput.grid(row=17, column=0, columnspan=2)
-    sincEnter.grid(row=17, column=2)
-
-    untLabel = Label(root, text="Until this date:")
-    untInput = Entry(root, width=40)
-    untEnter = Button(root, text="Enter", padx=10, pady=2)
-
-    untLabel.grid(row=18, column=0)
-    untInput.grid(row=19, column=0, columnspan=2)
-    untEnter.grid(row=19, column=2)
-
-    latLabel = Label(root, text="Check for the latest tweets:")
-    latButton = Button(root, text="Latest", padx=10, pady=5)
-
-    latLabel.grid(row=20, column=0)
-    latButton.grid(row=20, column=1)
-
-    return search_query
 
 def init_driver():
     # opens a headless/invisible automated version of chrome
@@ -173,7 +74,7 @@ class WaitForMoreThanNElementsToBePresent(object):
             return False
 
 
-def search_twitter(driver, keywords):
+def search_twitter(driver, keywords, latest):
  
     # checks for the presence of the search box before typing in search query
     box = driver.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[aria-label='Search query']")))
@@ -185,9 +86,12 @@ def search_twitter(driver, keywords):
     # initial wait for the search results to load
     driver.implicitly_wait(1)
  
-    # clicks "Latest" tab to get most recent tweets
-    driver.find_element_by_link_text("Latest").click()
-    driver.wait = WebDriverWait(driver, 1) 
+    if latest == 1:
+        # clicks "Latest" tab to get most recent tweets
+        driver.find_element_by_link_text("Latest").click()
+        driver.wait = WebDriverWait(driver, 1) 
+    else:
+        pass
 
     return
 
@@ -371,6 +275,105 @@ def date_search(since, until):
 
     return since, until
 
+def search(keywords):
+    
+    global search_query
+    search_query = []
+
+    keywords.append(search_query)
+    keywords.append(" ")
+    
+    return search_query
+
+def visual_search(root):
+
+    #TODO display the location where things are beings earched visually
+    geoLabel = Label(root, text="In this Location (\"Mountain View, CA\"): ")
+    #TODO put a greyed out example in the text box
+    #TODO https://stackoverflow.com/questions/51781651/showing-a-greyed-out-default-text-in-a-tk-entry
+    #TODO https://stackoverflow.com/questions/30491721/how-to-insert-a-temporary-text-in-a-tkinter-entry-widget/39677021#39677021
+    geoInput = Entry(root, width=40)
+    #TODO et the user decide how far from the point selected they are searching
+
+    geoLabel.grid(row=0, column=0)
+    geoInput.grid(row=1, column=0, columnspan=2)
+
+    #TODO https://www.reddit.com/r/learnpython/comments/6tw5ve/tkinter_entry_box_how_to_declare_a_light_grey/
+    #TODO https://stackoverflow.com/questions/30491721/how-to-insert-a-temporary-text-in-a-tkinter-entry-widget/39677021#39677021
+    allLabel = Label(root, text="All of these words:")
+    allInput = Entry(root, width=40)
+
+    allLabel.grid(row=2, column=0)
+    allInput.grid(row=3, column=0, columnspan=2)
+
+    exactLabel = Label(root, text="Exactly this phrase:")
+    exactInput = Entry(root, width=40)
+
+    exactLabel.grid(row=4, column=0)
+    exactInput.grid(row=5, column=0, columnspan=2)
+
+    orLabel = Label(root, text="Any of these words:")
+    orInput = Entry(root, width=40)
+
+    orLabel.grid(row=6, column=0)
+    orInput.grid(row=7, column=0, columnspan=2)
+
+    notLabel = Label(root, text="None of these words:")
+    notInput = Entry(root, width=40)
+
+    notLabel.grid(row=8, column=0)
+    notInput.grid(row=9, column=0, columnspan=2)
+
+    hashLabel = Label(root, text="These hashtags (starts with #):")
+    hashInput = Entry(root, width=40)
+
+    hashLabel.grid(row=10, column=0)
+    hashInput.grid(row=11, column=0, columnspan=2)
+
+    hashLabel = Label(root, text="These hashtags:")
+    hashInput = Entry(root, width=40)
+
+    hashLabel.grid(row=12, column=0)
+    hashInput.grid(row=13, column=0, columnspan=2)
+
+    mentLabel = Label(root, text="Mentioning these accounts (starts with @):")
+    mentInput = Entry(root, width=40)
+
+    mentLabel.grid(row=14, column=0)
+    mentInput.grid(row=15, column=0, columnspan=2)
+
+    #TODO tkcalendar might work here instead of text input
+    sincLabel = Label(root, text="Since this date:")
+    sincInput = Entry(root, width=20)
+
+    sincLabel.grid(row=16, column=0)
+    sincInput.grid(row=17, column=0)
+
+    untLabel = Label(root, text="Until this date:")
+    untInput = Entry(root, width=20)
+
+    untLabel.grid(row=16, column=1)
+    untInput.grid(row=17, column=1)
+
+    latest = IntVar()
+    latCheck = Checkbutton(root, text="Latest", variable=latest, onvalue=1, offvalue=0)
+    latCheck.deselect()
+    #TODO make sure this functions properly
+    latest = latest.get()
+
+    latCheck.grid(row=20, column=0)
+
+    submit = Button(root, text="Submit", padx=10, pady=2)
+    submit.grid(row=21, column=0, columnspan=2)
+
+
+    #TODO without this input the UI doesnt pop up
+    search_query = input("Search query here: ")
+
+    for i in search_query:
+        print(i)
+
+    return search_query, latest
 
 if __name__ == "__main__":
     #TODO gui creation here
@@ -379,7 +382,7 @@ if __name__ == "__main__":
 
     #TODO append each returned thing to a search query list with spaces in between each query
     #TODO search query into string
-    search = visual_search(root)
+    search, latest = visual_search(root)
   
     # start a driver for a web browser/compiles regex for parsing tweets
     driver = init_driver()
@@ -389,7 +392,7 @@ if __name__ == "__main__":
     login_twitter(driver)
 
     # the advanced search to be performed
-    search_twitter(driver, search)
+    search_twitter(driver, search, latest)
 
     # TODO create an actual limit to how many tweets are pulled/can be pulled
     # grabs the tweets from the twitter search
