@@ -54,73 +54,72 @@ def query():
         search_query.append(" ")
     print("")
 
-    ### Example: happy hour · contains the exact phrase “happy hour”
-    ##print("This Exact Phrase: ", end = '')
-    ##exactW = input()
-    ##if exactW == "":
-    ##    pass
-    ##else:
-    ##    search_query.append("\"" + exactW +"\"")
-    ##    search_query.append(" ")
-    ##print("")
-##
-    ### Example: cats dogs · contains either “cats” or “dogs” (or both)
-    ##print("Any of these words: ", end = '')
-    ##anyW = input()
-    ##if anyW == "":
-    ##    pass
-    ##else:
-    ##    search_query.append(anyW.replace(" ", " OR "))
-    ##    search_query.append(" ")
-    ##print("")
-##
-    ### Example: cats dogs · does not contain “cats” and does not contain “dogs”
-    ##print("None of these Words: ", end = '')
-    ##noneW = input()
-    ##if noneW == "":
-    ##    pass
-    ##else:
-    ##    search_query.append("-" + noneW.replace(" ", " -"))
-    ##    search_query.append(" ")
-    ##print("")
-##
-    ### Example: #ThrowbackThursday · contains the hashtag #ThrowbackThursday
-    ##print("These hashtags (starts with #): ", end = '')
-    ##hashW = input()
-    ##if hashW == "":
-    ##    pass
-    ##else:
-    ##    search_query.append(hashW)
-    ##    search_query.append(" ")
-    ##print("")
-##
-    ### Example: @SFBART @Caltrain · mentions @SFBART or mentions @Caltrain
-    ##print("Mentioning these accounts (starts with @): ", end = '')
-    ##mentW = input()
-    ##if mentW == "":
-    ##    pass
-    ##else:
-    ##    search_query.append(mentW)
-    ##    search_query.append(" ")
-    ##print("")
+    # Example: happy hour · contains the exact phrase “happy hour”
+    print("This Exact Phrase: ", end = '')
+    exactW = input()
+    if exactW == "":
+        pass
+    else:
+        search_query.append("\"" + exactW +"\"")
+        search_query.append(" ")
+    print("")
 
-    ### Example: “since:yyyy-mm-dd” “until:yyyy-mm-dd”
-    ##print("Since, Until these dates (either or both) ", end = '')
-    ##print("Since this date (yyyy-mm-dd): ", end = '')
-    ##since = input()
-    ##print("Until this date (yyyy-mm-dd): ", end = '')
-    ##until = input()
-    ##if since == "":
-    ##    pass
-    ##elif until == "":
-    ##    pass
-    ##else:
-    ##    if since:
-    ##        search_query.append("since:" + since)
-    ##    elif until:
-    ##        search_query.append("until:" + until)
-    ##search_query.append(" ")
-    ##print("")
+    # Example: cats dogs · contains either “cats” or “dogs” (or both)
+    print("Any of these words: ", end = '')
+    anyW = input()
+    if anyW == "":
+        pass
+    else:
+        search_query.append(anyW.replace(" ", " OR "))
+        search_query.append(" ")
+    print("")
+
+    # Example: cats dogs · does not contain “cats” and does not contain “dogs”
+    print("None of these Words: ", end = '')
+    noneW = input()
+    if noneW == "":
+        pass
+    else:
+        search_query.append("-" + noneW.replace(" ", " -"))
+        search_query.append(" ")
+    print("")
+
+    # Example: #ThrowbackThursday · contains the hashtag #ThrowbackThursday
+    print("These hashtags (starts with #): ", end = '')
+    hashW = input()
+    if hashW == "":
+        pass
+    else:
+        search_query.append(hashW)
+        search_query.append(" ")
+    print("")
+
+    # Example: @SFBART @Caltrain · mentions @SFBART or mentions @Caltrain
+    print("Mentioning these accounts (starts with @): ", end = '')
+    mentW = input()
+    if mentW == "":
+        pass
+    else:
+        search_query.append(mentW)
+        search_query.append(" ")
+    print("")   
+    # Example: “since:yyyy-mm-dd” “until:yyyy-mm-dd”
+    print("Since, Until these dates (either or both) ", end = '')
+    print("Since this date (yyyy-mm-dd): ", end = '')
+    since = input()
+    print("Until this date (yyyy-mm-dd): ", end = '')
+    until = input()
+    if since == "":
+        pass
+    elif until == "":
+        pass
+    else:
+        if since:
+            search_query.append("since:" + since)
+        elif until:
+            search_query.append("until:" + until)
+    search_query.append(" ")
+    print("")
 
     for i in search_query:
         print(i)
@@ -206,6 +205,14 @@ def pull_tweets(driver, regex):
             ##for i in tweets:
             ##    print(i.text)
             ##    print("\n\n")
+
+            tweetxt = open("rawTweet.txt", "a", encoding="utf8")
+
+            for i in tweets:
+                tweetxt.write(i.text + "\\n")
+
+            tweetxt.close()
+
  
             # find number of visible tweets
             number_of_tweets = len(tweets)
