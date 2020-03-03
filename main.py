@@ -261,19 +261,25 @@ def ment_search(mentW):
 
     return mentW
 
-def date_search(since, until):
-    # Example: “since:yyyy-mm-dd” “until:yyyy-mm-dd”
-    if since == "":
-        pass
-    elif until == "":
-        pass
-    else:
-        if since:
-            since = ("since:" + since)
-        elif until:
-            until = ("until:" + until)
+#def date_search(since, until):
+#    # Example: “since:yyyy-mm-dd” “until:yyyy-mm-dd”
+#    if since == "":
+#        pass
+#    elif until == "":
+#        pass
+#    else:
+#        if since:
+#            since = ("since:" + since)
+#        elif until:
+#            until = ("until:" + until)
+#
+#    return since, until
 
-    return since, until
+def calendar():
+    date = DateEntry(locale='en_US', date_pattern='yyyy/MM/dd')
+
+    # https://stackoverflow.com/questions/50814594/how-save-date-from-calendar-in-tkcalendar-python
+    return date
 
 def search(keywords):
     
@@ -285,7 +291,25 @@ def search(keywords):
     
     return search_query
 
+def submit(geoInput, allInput, exactInput, orInput, notInput, hashInput, mentInput):
+    search_query.append(geoInput.get())
+    search_query.append(allInput.get())
+    search_query.append(exactInput.get())
+    search_query.append(orInput.get())
+    search_query.append(notInput.get())
+    search_query.append(hashInput.get())
+    search_query.append(mentInput.get())
+
+    for i in search_query:
+        print (i)
+
+    return search_query
+
+#TKinter UI for writing query on Reddit and some settings
+#TODO visually show the database of tweets after a search
 def visual_search(root):
+
+    #TODO put the search functions from above IN THIS function along with its UI element
 
     #TODO display the location where things are beings earched visually
     geoLabel = Label(root, text="In this Location (\"Mountain View, CA\"): ")
@@ -330,11 +354,11 @@ def visual_search(root):
     hashLabel.grid(row=10, column=0)
     hashInput.grid(row=11, column=0, columnspan=2)
 
-    hashLabel = Label(root, text="These hashtags:")
-    hashInput = Entry(root, width=40)
+    mentLabel = Label(root, text="These people are mentioned:")
+    mentInput = Entry(root, width=40)
 
-    hashLabel.grid(row=12, column=0)
-    hashInput.grid(row=13, column=0, columnspan=2)
+    mentLabel.grid(row=12, column=0)
+    mentInput.grid(row=13, column=0, columnspan=2)
 
     mentLabel = Label(root, text="Mentioning these accounts (starts with @):")
     mentInput = Entry(root, width=40)
@@ -342,18 +366,20 @@ def visual_search(root):
     mentLabel.grid(row=14, column=0)
     mentInput.grid(row=15, column=0, columnspan=2)
 
-    #TODO tkcalendar might work here instead of text input
+    #TODO use tkcalendar here
+    #YYYY-MM-DD
     sincLabel = Label(root, text="Since this date:")
-    sincInput = Entry(root, width=20)
+    #TODO maybe the text=VAR can be a variable and change into what the date is?
+    sincButton = Button(root, width=20, command=calendar)
 
     sincLabel.grid(row=16, column=0)
-    sincInput.grid(row=17, column=0)
+    sincButton.grid(row=17, column=0)
 
     untLabel = Label(root, text="Until this date:")
-    untInput = Entry(root, width=20)
+    untButton = Button(root, width=20, command=calendar)
 
     untLabel.grid(row=16, column=1)
-    untInput.grid(row=17, column=1)
+    untButton.grid(row=17, column=1)
 
     latest = IntVar()
     latCheck = Checkbutton(root, text="Latest", variable=latest, onvalue=1, offvalue=0)
@@ -361,11 +387,11 @@ def visual_search(root):
     #TODO make sure this functions properly
     latest = latest.get()
 
-    latCheck.grid(row=20, column=0)
+    latCheck.grid(row=18, column=0)
 
-    submit = Button(root, text="Submit", padx=10, pady=2)
-    submit.grid(row=21, column=0, columnspan=2)
-
+    #TODO hacky way of pulling every text fields info
+    submit = Button(root, text="Submit", padx=10, pady=2, command=lambda: submit(geoInput, allInput, exactInput, orInput, notInput, hashInput, mentInput))
+    submit.grid(row=19, column=0, columnspan=2)
 
     #TODO without this input the UI doesnt pop up
     search_query = input("Search query here: ")
@@ -379,6 +405,7 @@ if __name__ == "__main__":
     #TODO gui creation here
     # initializing Gui
     root = Tk()
+    root.title("Twitter Advanced Search Scraper")
 
     #TODO append each returned thing to a search query list with spaces in between each query
     #TODO search query into string
