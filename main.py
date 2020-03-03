@@ -120,8 +120,6 @@ def pull_tweets(driver, regex):
 
             for i in tweets:
                 parse_tweets(i.text, regex)
-
-                #TODO store the tweets/tweet objects somewhere within this loop
  
             # https://stackoverflow.com/questions/20986631/how-can-i-scroll-a-web-page-using-selenium-webdriver-in-python
             # https://stackoverflow.com/questions/27003423/staleelementreferenceexception-on-python-selenium
@@ -207,7 +205,6 @@ def geo_search(location):
         pass
     else:
         geoLoc = ("geocode:" + str(geoLoc.lat) + "," + str(geoLoc.lng) + ",138km,") # 138km is the length of suffolk county
-        #TODO spaces must be appended search_query.append(" ")
 
     return geoLoc
 
@@ -301,6 +298,8 @@ def submit(geoInput, allInput, exactInput, orInput, notInput, hashInput, mentInp
     search_query.append(mentInput.get())
 
     for i in search_query:
+        if i == None:
+            i = ""
         print (i)
 
     return search_query
@@ -311,13 +310,13 @@ def visual_search(root):
 
     #TODO put the search functions from above IN THIS function along with its UI element
 
-    #TODO display the location where things are beings earched visually
+    #TODO display the location where things are beings searched visually (before pressing submit)
     geoLabel = Label(root, text="In this Location (\"Mountain View, CA\"): ")
     #TODO put a greyed out example in the text box
     #TODO https://stackoverflow.com/questions/51781651/showing-a-greyed-out-default-text-in-a-tk-entry
     #TODO https://stackoverflow.com/questions/30491721/how-to-insert-a-temporary-text-in-a-tkinter-entry-widget/39677021#39677021
     geoInput = Entry(root, width=40)
-    #TODO et the user decide how far from the point selected they are searching
+    #TODO let the user decide how far from the point selected they are searching (in km)
 
     geoLabel.grid(row=0, column=0)
     geoInput.grid(row=1, column=0, columnspan=2)
@@ -354,44 +353,38 @@ def visual_search(root):
     hashLabel.grid(row=10, column=0)
     hashInput.grid(row=11, column=0, columnspan=2)
 
-    mentLabel = Label(root, text="These people are mentioned:")
+    mentLabel = Label(root, text="Mentioning these accounts (starts with @):")
     mentInput = Entry(root, width=40)
 
     mentLabel.grid(row=12, column=0)
     mentInput.grid(row=13, column=0, columnspan=2)
 
-    mentLabel = Label(root, text="Mentioning these accounts (starts with @):")
-    mentInput = Entry(root, width=40)
-
-    mentLabel.grid(row=14, column=0)
-    mentInput.grid(row=15, column=0, columnspan=2)
-
-    #TODO use tkcalendar here
     #YYYY-MM-DD
     sincLabel = Label(root, text="Since this date:")
-    #TODO maybe the text=VAR can be a variable and change into what the date is?
+    #TODO maybe the text=VAR can be a variable and change into what the date selected is?
+    #TODO maybe use an input box here so you can EITHER type in the sate or use the calendar, both being pulled as text
     sincButton = Button(root, width=20, command=calendar)
 
-    sincLabel.grid(row=16, column=0)
-    sincButton.grid(row=17, column=0)
+    sincLabel.grid(row=14, column=0)
+    sincButton.grid(row=15, column=0)
 
     untLabel = Label(root, text="Until this date:")
     untButton = Button(root, width=20, command=calendar)
 
-    untLabel.grid(row=16, column=1)
-    untButton.grid(row=17, column=1)
+    untLabel.grid(row=14, column=1)
+    untButton.grid(row=15, column=1)
 
     latest = IntVar()
-    latCheck = Checkbutton(root, text="Latest", variable=latest, onvalue=1, offvalue=0)
+    latCheck = Checkbutton(root, text="Search for Latest Tweets?", variable=latest, onvalue=1, offvalue=0)
     latCheck.deselect()
     #TODO make sure this functions properly
     latest = latest.get()
 
-    latCheck.grid(row=18, column=0)
+    latCheck.grid(row=16, column=0)
 
     #TODO hacky way of pulling every text fields info
     submit = Button(root, text="Submit", padx=10, pady=2, command=lambda: submit(geoInput, allInput, exactInput, orInput, notInput, hashInput, mentInput))
-    submit.grid(row=19, column=0, columnspan=2)
+    submit.grid(row=17, column=0, columnspan=2)
 
     #TODO without this input the UI doesnt pop up
     search_query = input("Search query here: ")
@@ -402,7 +395,6 @@ def visual_search(root):
     return search_query, latest
 
 if __name__ == "__main__":
-    #TODO gui creation here
     # initializing Gui
     root = Tk()
     root.title("Twitter Advanced Search Scraper")
@@ -421,11 +413,12 @@ if __name__ == "__main__":
     # the advanced search to be performed
     search_twitter(driver, search, latest)
 
-    # TODO create an actual limit to how many tweets are pulled/can be pulled
+    #TODO create an actual limit to how many tweets are pulled/can be pulled
     # grabs the tweets from the twitter search
     tweets = pull_tweets(driver, regex)
 
     # close the driver:
     close_driver(driver)
 
+    #TODO program must loop every hour, for an unlimited amount of time (24/7 MONITOR for a specific query)
     root.mainloop()
