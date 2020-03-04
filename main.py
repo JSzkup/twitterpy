@@ -206,7 +206,7 @@ def make_form(root, fields):
     # for every field, create a row in the form for entry
     for field in fields:
         row = Frame(root)
-        lab = Label(row, width=22, text=field+": ", anchor='w')
+        lab = Label(row, width=28, text=field+": ", anchor='w')
         ent = Entry(row)
 
         row.pack(side = TOP, fill = X, padx = 10 , pady = 5)
@@ -231,12 +231,14 @@ def build_query(entries):
     else:
         geoLoc = ("geocode:" + str(geoLoc.lat) + "," + str(geoLoc.lng) + ",138km,")
         search_query.append(geoLoc)
+        search_query.append(" ")
     
     allWords = str(entries['All of these words'].get())
     if allWords == "":
         pass
     else:
         search_query.append(allWords)
+        search_query.append(" ")
 
     exaWords = str(entries['This exact phrase'].get())
     if exaWords == "":
@@ -244,6 +246,7 @@ def build_query(entries):
     else:
         exaWords = ("\"" + exaWords +"\"")
         search_query.append(exaWords)
+        search_query.append(" ")
 
     anyWords = str(entries['Any of these words'].get())
     if anyWords == "":
@@ -251,6 +254,7 @@ def build_query(entries):
     else:
         anyWords = (anyWords.replace(" ", " OR "))
         search_query.append(anyWords)
+        search_query.append(" ")
 
     nonWords = str(entries['None of these words'].get())
     if nonWords == "":
@@ -258,19 +262,36 @@ def build_query(entries):
     else:
         nonWords = ("-" + nonWords.replace(" ", " -"))
         search_query.append(nonWords)
+        search_query.append(" ")
 
     hasWords = str(entries['These hashtags'].get())
     if hasWords == "":
         pass
     else:
         search_query.append(hasWords)
+        search_query.append(" ")
 
     menWords = str(entries['Mentioning these accounts'].get())
     if menWords == "":
         pass
     else:
         search_query.append(menWords)
+        search_query.append(" ")
 
+    sinWords = str(entries['Since this date (yyyy-mm-dd)'].get())
+    if sinWords == "":
+        pass
+    else:
+        search_query.append("since:" + sinWords)
+        search_query.append(" ")
+
+    untWords = str(entries['Until this date (yyyy-mm-dd)'].get())
+    if untWords == "":
+        pass
+    else:
+        search_query.append("until:" + untWords)
+        search_query.append(" ")
+        
     for i in search_query:
         print(i)
 
@@ -305,7 +326,7 @@ if __name__ == "__main__":
     root.title("Twitter Advanced Search Scraper")
 
     # creates the form based off the fields in the fields tuple
-    fields = ('At this location', 'All of these words', 'This exact phrase', 'Any of these words', 'None of these words', 'These hashtags', 'Mentioning these accounts')
+    fields = ('At this location', 'All of these words', 'This exact phrase', 'Any of these words', 'None of these words', 'These hashtags', 'Mentioning these accounts', 'Since this date (yyyy-mm-dd)', 'Until this date (yyyy-mm-dd)')
     ents = make_form(root, fields)
 
     # binds the enter key to the submit button
