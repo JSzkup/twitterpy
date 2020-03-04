@@ -197,208 +197,84 @@ def close_driver(driver):
     # closes chrome web browser
     driver.close()
 
-def geo_search(location):
-    # Example: geocode:45.523452,-122.676207,10km
-    # Open Street Map used for geolocation https://operations.osmfoundation.org/policies/nominatim/
-    geoLoc = geocoder.osm(location)
-    if geoLoc == "":
-        pass
-    else:
-        geoLoc = ("geocode:" + str(geoLoc.lat) + "," + str(geoLoc.lng) + ",138km,") # 138km is the length of suffolk county
+def makeform(root, fields):
+    #TODO add date entry
+    #TODO add picking of latest tweets 
 
-    return geoLoc
+   entries = {}
 
-def all_search(allW):
-    # Example: what’s happening · contains both “what’s” and “happening”
-    if allW == "":
-        pass
-    
-    return allW
+   for field in fields:
+        row = Frame(root)
+        lab = Label(row, width=22, text=field+": ", anchor='w')
+        ent = Entry(row)
 
-def exact_search(exactW):
-    # Example: happy hour · contains the exact phrase “happy hour”
-    if exactW == "":
-        pass
-    else:
-        exactW = ("\"" + exactW +"\"")
-    
-    return exactW
+        row.pack(side = TOP, fill = X, padx = 10 , pady = 5)
+        lab.pack(side = LEFT)
+        ent.pack(side = RIGHT, expand = YES, fill = X)
 
-def any_search(anyW):
-    # Example: cats dogs · contains either “cats” or “dogs” (or both)
-    if anyW == "":
-        pass
-    else:
-        anyW = (anyW.replace(" ", " OR "))
+        entries[field] = ent
 
-    return anyW
+   return entries
 
-def none_search(noneW):
-    # Example: cats dogs · does not contain “cats” and does not contain “dogs”
-    if noneW == "":
-        pass
-    else:
-        noneW = ("-" + noneW.replace(" ", " -"))
+def build_query(entries):
 
-    return noneW
-
-def hash_search(hashW):
-    # Example: #ThrowbackThursday · contains the hashtag #ThrowbackThursday
-    if hashW == "":
-        pass
-
-    #TODO if the typed word has no hashtag, add one
-
-    return hashW
-
-def ment_search(mentW):
-    # Example: @SFBART @Caltrain · mentions @SFBART or mentions @Caltrain
-    if mentW == "":
-        pass
-
-    return mentW
-
-#def date_search(since, until):
-#    # Example: “since:yyyy-mm-dd” “until:yyyy-mm-dd”
-#    if since == "":
-#        pass
-#    elif until == "":
-#        pass
-#    else:
-#        if since:
-#            since = ("since:" + since)
-#        elif until:
-#            until = ("until:" + until)
-#
-#    return since, until
-
-def calendar():
-    date = DateEntry(locale='en_US', date_pattern='yyyy/MM/dd')
-
-    # https://stackoverflow.com/questions/50814594/how-save-date-from-calendar-in-tkcalendar-python
-    return date
-
-def search(keywords):
-    
-    global search_query
     search_query = []
 
-    keywords.append(search_query)
-    keywords.append(" ")
+    locWords = str(entries['At this location'].get())
+    geoLoc = geocoder.osm(locWords)
+    if locWords == "":
+        #geoLoc= ""
+        pass
+    else:
+        geoLoc = ("geocode:" + str(geoLoc.lat) + "," + str(geoLoc.lng) + ",138km,")
+        search_query.append(geoLoc)
     
-    return search_query
+    allWords = str(entries['All of these words'].get())
+    if allWords == "":
+        pass
+    else:
+        search_query.append(allWords)
 
-def submit(geoInput, allInput, exactInput, orInput, notInput, hashInput, mentInput):
-    search_query.append(geoInput.get())
-    search_query.append(allInput.get())
-    search_query.append(exactInput.get())
-    search_query.append(orInput.get())
-    search_query.append(notInput.get())
-    search_query.append(hashInput.get())
-    search_query.append(mentInput.get())
+    exaWords = str(entries['This exact phrase'].get())
+    if exaWords == "":
+        pass
+    else:
+        exaWords = ("\"" + exaWords +"\"")
+        search_query.append(exaWords)
 
-    for i in search_query:
-        if i == None:
-            i = ""
-        print (i)
+    anyWords = str(entries['Any of these words'].get())
+    if anyWords == "":
+        pass
+    else:
+        anyWords = (anyWords.replace(" ", " OR "))
+        search_query.append(anyWords)
 
-    return search_query
+    nonWords = str(entries['None of these words'].get())
+    if nonWords == "":
+        pass
+    else:
+        nonWords = ("-" + nonWords.replace(" ", " -"))
+        search_query.append(nonWords)
 
-#TKinter UI for writing query on Reddit and some settings
-#TODO visually show the database of tweets after a search
-def visual_search(root):
+    hasWords = str(entries['These hashtags'].get())
+    if hasWords == "":
+        pass
+    else:
+        search_query.append(hasWords)
 
-    #TODO put the search functions from above IN THIS function along with its UI element
 
-    #TODO display the location where things are beings searched visually (before pressing submit)
-    geoLabel = Label(root, text="In this Location (\"Mountain View, CA\"): ")
-    #TODO put a greyed out example in the text box
-    #TODO https://stackoverflow.com/questions/51781651/showing-a-greyed-out-default-text-in-a-tk-entry
-    #TODO https://stackoverflow.com/questions/30491721/how-to-insert-a-temporary-text-in-a-tkinter-entry-widget/39677021#39677021
-    geoInput = Entry(root, width=40)
-    #TODO let the user decide how far from the point selected they are searching (in km)
-
-    geoLabel.grid(row=0, column=0)
-    geoInput.grid(row=1, column=0, columnspan=2)
-
-    #TODO https://www.reddit.com/r/learnpython/comments/6tw5ve/tkinter_entry_box_how_to_declare_a_light_grey/
-    #TODO https://stackoverflow.com/questions/30491721/how-to-insert-a-temporary-text-in-a-tkinter-entry-widget/39677021#39677021
-    allLabel = Label(root, text="All of these words:")
-    allInput = Entry(root, width=40)
-
-    allLabel.grid(row=2, column=0)
-    allInput.grid(row=3, column=0, columnspan=2)
-
-    exactLabel = Label(root, text="Exactly this phrase:")
-    exactInput = Entry(root, width=40)
-
-    exactLabel.grid(row=4, column=0)
-    exactInput.grid(row=5, column=0, columnspan=2)
-
-    orLabel = Label(root, text="Any of these words:")
-    orInput = Entry(root, width=40)
-
-    orLabel.grid(row=6, column=0)
-    orInput.grid(row=7, column=0, columnspan=2)
-
-    notLabel = Label(root, text="None of these words:")
-    notInput = Entry(root, width=40)
-
-    notLabel.grid(row=8, column=0)
-    notInput.grid(row=9, column=0, columnspan=2)
-
-    hashLabel = Label(root, text="These hashtags (starts with #):")
-    hashInput = Entry(root, width=40)
-
-    hashLabel.grid(row=10, column=0)
-    hashInput.grid(row=11, column=0, columnspan=2)
-
-    mentLabel = Label(root, text="Mentioning these accounts (starts with @):")
-    mentInput = Entry(root, width=40)
-
-    mentLabel.grid(row=12, column=0)
-    mentInput.grid(row=13, column=0, columnspan=2)
-
-    #YYYY-MM-DD
-    sincLabel = Label(root, text="Since this date:")
-    #TODO maybe the text=VAR can be a variable and change into what the date selected is?
-    #TODO maybe use an input box here so you can EITHER type in the sate or use the calendar, both being pulled as text
-    sincButton = Button(root, width=20, command=calendar)
-
-    sincLabel.grid(row=14, column=0)
-    sincButton.grid(row=15, column=0)
-
-    untLabel = Label(root, text="Until this date:")
-    untButton = Button(root, width=20, command=calendar)
-
-    untLabel.grid(row=14, column=1)
-    untButton.grid(row=15, column=1)
-
-    latest = IntVar()
-    latCheck = Checkbutton(root, text="Search for Latest Tweets?", variable=latest, onvalue=1, offvalue=0)
-    latCheck.deselect()
-    #TODO make sure this functions properly
-    latest = latest.get()
-
-    latCheck.grid(row=16, column=0)
-
-    #TODO hacky way of pulling every text fields info
-    submit = Button(root, text="Submit", padx=10, pady=2, command=lambda: submit(geoInput, allInput, exactInput, orInput, notInput, hashInput, mentInput))
-    submit.grid(row=17, column=0, columnspan=2)
-
-    #TODO without this input the UI doesnt pop up
-    search_query = input("Search query here: ")
+    menWords = str(entries['Mentioning these accounts'].get())
+    if menWords == "":
+        pass
+    else:
+        search_query.append(menWords)
 
     for i in search_query:
         print(i)
 
-    return search_query, latest
+    #return search_query
 
-if __name__ == "__main__":
-    # initializing Gui
-    root = Tk()
-    root.title("Twitter Advanced Search Scraper")
-
+def twitter_func(root):
     #TODO append each returned thing to a search query list with spaces in between each query
     #TODO search query into string
     search, latest = visual_search(root)
@@ -420,5 +296,27 @@ if __name__ == "__main__":
     # close the driver:
     close_driver(driver)
 
+
+if __name__ == "__main__":
+    # initializing Gui
+    root = Tk()
+    root.title("Twitter Advanced Search Scraper")
+
+    # creates the form based off the fields in the fields tuple
+    fields = ('At this location', 'All of these words', 'This exact phrase', 'Any of these words', 'None of these words', 'These hashtags', 'Mentioning these accounts')
+    ents = makeform(root, fields)
+
+    # binds the enter key to the submit button
+    root.bind('<Return>', (lambda event, e = ents: build_query(e)))
+
+    #TODO make sure both commands are run through and pass the searches into the twitter_func function
+    b1 = Button(root, text = 'Submit',
+       command=(lambda e = ents: [build_query(e), twitter_func(root)]))
+    b1.pack(side = LEFT, padx = 5, pady = 5)
+
+    b2 = Button(root, text = 'Quit', command = root.quit)
+    b2.pack(side = LEFT, padx = 5, pady = 5)
+
     #TODO program must loop every hour, for an unlimited amount of time (24/7 MONITOR for a specific query)
     root.mainloop()
+    
