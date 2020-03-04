@@ -197,13 +197,14 @@ def close_driver(driver):
     # closes chrome web browser
     driver.close()
 
-def makeform(root, fields):
+def make_form(root, fields):
     #TODO add date entry
     #TODO add picking of latest tweets 
 
-   entries = {}
+    entries = {}
 
-   for field in fields:
+    # for every field, create a row in the form for entry
+    for field in fields:
         row = Frame(root)
         lab = Label(row, width=22, text=field+": ", anchor='w')
         ent = Entry(row)
@@ -214,13 +215,15 @@ def makeform(root, fields):
 
         entries[field] = ent
 
-   return entries
+    return entries
 
 def build_query(entries):
 
+    # final advanced search query put into twitter
     search_query = []
 
     locWords = str(entries['At this location'].get())
+    # uses the entered text to pull specific geolocation from open street maps
     geoLoc = geocoder.osm(locWords)
     if locWords == "":
         #geoLoc= ""
@@ -262,7 +265,6 @@ def build_query(entries):
     else:
         search_query.append(hasWords)
 
-
     menWords = str(entries['Mentioning these accounts'].get())
     if menWords == "":
         pass
@@ -272,12 +274,10 @@ def build_query(entries):
     for i in search_query:
         print(i)
 
-    #return search_query
+    return search_query
 
-def twitter_func(root):
-    #TODO append each returned thing to a search query list with spaces in between each query
-    #TODO search query into string
-    search, latest = visual_search(root)
+# twitter and browser functions moved here for UI consistency
+def twitter_func(root, search): 
   
     # start a driver for a web browser/compiles regex for parsing tweets
     driver = init_driver()
@@ -304,18 +304,19 @@ if __name__ == "__main__":
 
     # creates the form based off the fields in the fields tuple
     fields = ('At this location', 'All of these words', 'This exact phrase', 'Any of these words', 'None of these words', 'These hashtags', 'Mentioning these accounts')
-    ents = makeform(root, fields)
+    ents = make_form(root, fields)
 
     # binds the enter key to the submit button
-    root.bind('<Return>', (lambda event, e = ents: build_query(e)))
+    root.bind('<Return>', (lambda event, e = ents: twitter_func(root, build_query(e))))
 
     #TODO make sure both commands are run through and pass the searches into the twitter_func function
-    b1 = Button(root, text = 'Submit',
-       command=(lambda e = ents: [build_query(e), twitter_func(root)]))
-    b1.pack(side = LEFT, padx = 5, pady = 5)
+    #TODO multiple commands can be run with this syntax (lambda e = ents: [twitter_func(root, build_query(e), other_function()])))
+    submitBtn = Button(root, text = 'Submit',
+       command=(lambda e = ents: twitter_func(root, build_query(e))))
+    submitBtn.pack(side = LEFT, padx = 5, pady = 5)
 
-    b2 = Button(root, text = 'Quit', command = root.quit)
-    b2.pack(side = LEFT, padx = 5, pady = 5)
+    quitBtn = Button(root, text = 'Quit', command = root.quit)
+    quitBtn.pack(side = LEFT, padx = 5, pady = 5)
 
     #TODO program must loop every hour, for an unlimited amount of time (24/7 MONITOR for a specific query)
     root.mainloop()
