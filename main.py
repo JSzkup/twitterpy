@@ -277,7 +277,7 @@ def build_query(entries):
     return search_query
 
 # twitter and browser functions moved here for UI consistency
-def twitter_func(root, search): 
+def twitter_func(root, search, latest): 
   
     # start a driver for a web browser/compiles regex for parsing tweets
     driver = init_driver()
@@ -296,6 +296,8 @@ def twitter_func(root, search):
     # close the driver:
     close_driver(driver)
 
+def print_var(var1):
+    print(var1)
 
 if __name__ == "__main__":
     # initializing Gui
@@ -307,12 +309,17 @@ if __name__ == "__main__":
     ents = make_form(root, fields)
 
     # binds the enter key to the submit button
-    root.bind('<Return>', (lambda event, e = ents: twitter_func(root, build_query(e))))
+    root.bind('<Return>', (lambda event, e = ents: twitter_func(root, build_query(e), var1.get())))
+
+    # checkbox to allow for showing of only the latest tweets (OFF by default)
+    var1 = IntVar()
+    checkBox = Checkbutton(root, text="Show the Latest Tweets only?", variable=var1)
+    checkBox.pack(side = LEFT, padx = 5, pady = 5)
 
     #TODO make sure both commands are run through and pass the searches into the twitter_func function
     #TODO multiple commands can be run with this syntax (lambda e = ents: [twitter_func(root, build_query(e), other_function()])))
     submitBtn = Button(root, text = 'Submit',
-       command=(lambda e = ents: twitter_func(root, build_query(e))))
+       command=(lambda e = ents: twitter_func(root, build_query(e), var1.get())))
     submitBtn.pack(side = LEFT, padx = 5, pady = 5)
 
     quitBtn = Button(root, text = 'Quit', command = root.quit)
