@@ -20,7 +20,6 @@ import geocoder
 
 # GUI creation
 from tkinter import *
-from tkcalendar import Calendar, DateEntry
 
 # pause program so it doesnt work faster than the driver can update
 # Twitter bot etiquette states you should have at least 1 second in between requests
@@ -32,11 +31,10 @@ import re
 
 def init_driver():
     # opens a headless/invisible automated version of chrome
-    #TODO Headless Chrome off for debugging
-    #chrome_options = Options()  
-    #chrome_options.add_argument("--headless")  
+    chrome_options = Options()  
+    chrome_options.add_argument("--headless")  
 
-    driver = webdriver.Chrome(executable_path=r'C:\PythonFiles\TwitterScraper\chromedriver.exe')#, options = chrome_options)  
+    driver = webdriver.Chrome(executable_path=r'C:\PythonFiles\TwitterScraper\chromedriver.exe', options = chrome_options)  
 
     return driver
 
@@ -120,6 +118,7 @@ def pull_tweets(driver, regex):
 
             for i in tweets:
                 parse_tweets(i.text, regex)
+                #TODO place parced tweets into database here as they come through
  
             # https://stackoverflow.com/questions/20986631/how-can-i-scroll-a-web-page-using-selenium-webdriver-in-python
             # https://stackoverflow.com/questions/27003423/staleelementreferenceexception-on-python-selenium
@@ -192,14 +191,11 @@ def parse_tweets(unparsedtweet, regexDict):
 
     return finalTweet
 
-
 def close_driver(driver):
     # closes chrome web browser
     driver.close()
 
 def make_form(root, fields):
-    #TODO add date entry
-    #TODO add picking of latest tweets 
 
     entries = {}
 
@@ -207,7 +203,7 @@ def make_form(root, fields):
     for field in fields:
         row = Frame(root)
         lab = Label(row, width=28, text=field+": ", anchor='w')
-        ent = Entry(row)
+        ent = Entry(row, width=30)
 
         row.pack(side = TOP, fill = X, padx = 10 , pady = 5)
         lab.pack(side = LEFT)
@@ -226,10 +222,9 @@ def build_query(entries):
     # uses the entered text to pull specific geolocation from open street maps
     geoLoc = geocoder.osm(locWords)
     if locWords == "":
-        #geoLoc= ""
         pass
     else:
-        geoLoc = ("geocode:" + str(geoLoc.lat) + "," + str(geoLoc.lng) + ",138km,")
+        geoLoc = ("geocode:" + str(geoLoc.lat) + "," + str(geoLoc.lng) + ",138km,") #TODO things are searched 85 miles from the geo point
         search_query.append(geoLoc)
         search_query.append(" ")
     
@@ -310,7 +305,6 @@ def twitter_func(root, search, latest):
     # the advanced search to be performed
     search_twitter(driver, search, latest)
 
-    #TODO create an actual limit to how many tweets are pulled/can be pulled
     # grabs the tweets from the twitter search
     tweets = pull_tweets(driver, regex)
 
@@ -320,6 +314,8 @@ def twitter_func(root, search, latest):
 def print_var(var1):
     print(var1)
 
+#TODO loop this every hour ( time.sleep(3600) )
+#TODO create UI portion for letting a user decide how far away from the geolocation point things are searched
 if __name__ == "__main__":
     # initializing Gui
     root = Tk()
@@ -337,8 +333,6 @@ if __name__ == "__main__":
     checkBox = Checkbutton(root, text="Show the Latest Tweets only?", variable=var1)
     checkBox.pack(side = LEFT, padx = 5, pady = 5)
 
-    #TODO make sure both commands are run through and pass the searches into the twitter_func function
-    #TODO multiple commands can be run with this syntax (lambda e = ents: [twitter_func(root, build_query(e), other_function()])))
     submitBtn = Button(root, text = 'Submit',
        command=(lambda e = ents: twitter_func(root, build_query(e), var1.get())))
     submitBtn.pack(side = LEFT, padx = 5, pady = 5)
@@ -346,6 +340,5 @@ if __name__ == "__main__":
     quitBtn = Button(root, text = 'Quit', command = root.quit)
     quitBtn.pack(side = LEFT, padx = 5, pady = 5)
 
-    #TODO program must loop every hour, for an unlimited amount of time (24/7 MONITOR for a specific query)
     root.mainloop()
     
