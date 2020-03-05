@@ -164,6 +164,7 @@ def parse_tweets(unparsedtweet, regexDict):
     for key, tweet in regexDict.items():
         match = tweet.search(unparsedtweet)
         if match == None:
+            #TODO text=notext is hacky, leaves 0 text a lot of the time instead of just preventing None Error
             text = "NO TEXT"
             pass
         else:
@@ -298,23 +299,30 @@ def build_query(entries):
     return search_query
 
 # twitter and browser functions moved here for UI consistency
-def twitter_func(root, search, latest): 
+def twitter_func(root, search, latest, loop): 
   
-    # start a driver for a web browser/compiles regex for parsing tweets
-    driver = init_driver()
-    regex = init_regex()
+    while loop == 1:
+        # start a driver for a web browser/compiles regex for parsing tweets
+        driver = init_driver()
+        regex = init_regex()
  
-    # log in to twitter (replace username/password with your own)
-    login_twitter(driver)
+        # log in to twitter (replace username/password with your own)
+        login_twitter(driver)
 
-    # the advanced search to be performed
-    search_twitter(driver, search, latest)
+        # the advanced search to be performed
+        search_twitter(driver, search, latest)
 
-    # grabs the tweets from the twitter search
-    tweets = pull_tweets(driver, regex)
+        # grabs the tweets from the twitter search
+        tweets = pull_tweets(driver, regex)
 
-    # close the driver:
-    close_driver(driver)
+        # close the driver:
+        close_driver(driver)
+
+        if loop == 1:
+            #TODO more testing on hourly running
+            time.sleep(3600)
+        else:
+            pass
 
 #TODO loop this every hour ( time.sleep(3600) )
 #TODO create UI portion for letting a user decide how far away from the geolocation point things are searched
@@ -328,15 +336,19 @@ if __name__ == "__main__":
     ents = make_form(root, fields)
 
     # binds the enter key to the submit button
-    root.bind('<Return>', (lambda event, e = ents: twitter_func(root, build_query(e), var1.get())))
+    root.bind('<Return>', (lambda event, e = ents: twitter_func(root, build_query(e), var1.get(), var2.get())))
 
     # checkbox to allow for showing of only the latest tweets (OFF by default)
     var1 = IntVar()
     checkBox = Checkbutton(root, text="Show the Latest Tweets only?", variable=var1)
     checkBox.pack(side = LEFT, padx = 5, pady = 5)
 
+    var2 = IntVar()
+    checkBox = Checkbutton(root, text="Run Hourly?", variable=var2)
+    checkBox.pack(side = LEFT, padx = 5, pady = 5)
+
     submitBtn = Button(root, text = 'Search', bg="light green",
-       command=(lambda e = ents: twitter_func(root, build_query(e), var1.get())))
+       command=(lambda e = ents: twitter_func(root, build_query(e), var1.get(), var2.get())))
     submitBtn.pack(side = RIGHT, padx = 5, pady = 5)
 
     #quitBtn = Button(root, text = 'Quit', command = root.quit)
