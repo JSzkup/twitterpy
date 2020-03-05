@@ -60,8 +60,6 @@ def build_query(entries):
     #return search_query
     
 def makeform(root, fields):
-    #TODO add date entry
-    #TODO add picking of latest tweets 
 
    entries = {}
 

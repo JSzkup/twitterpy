@@ -163,24 +163,28 @@ def parse_tweets(unparsedtweet, regexDict):
     # Separates each part of a tweet and putting them into respective variables
     for key, tweet in regexDict.items():
         match = tweet.search(unparsedtweet)
-        match = match.group(0)
-            
-        if match:
-            print(f"{key.upper()}: {match}")
-            if key == 'name':
-                name = match
-            elif key == 'username':
-                username = match
-            elif key == 'text':
-                text = match
+        if match == None:
+            text = "NO TEXT"
+            pass
         else:
-            print (f"{key.upper()}: NO {key.upper()}")
-            if key == 'name':
-                name = "NO NAME"
-            elif key == 'username':
-                username = "NO USERNAME"
-            elif key == 'text':
-                text = "NO TEXT"
+            match = match.group(0)
+            
+            if match:
+                print(f"{key.upper()}: {match}")
+                if key == 'name':
+                    name = match
+                elif key == 'username':
+                    username = match
+                elif key == 'text':
+                    text = match
+            else:
+                print (f"{key.upper()}: NO {key.upper()}")
+                if key == 'name':
+                    name = "NO NAME"
+                elif key == 'username':
+                    username = "NO USERNAME"
+                elif key == 'text':
+                    text = "NO TEXT"
 
     finalTweet = TweetObject(name, username, text)
 
@@ -202,6 +206,7 @@ def make_form(root, fields):
     # for every field, create a row in the form for entry
     for field in fields:
         row = Frame(root)
+        # Each field gets labeled with its field name
         lab = Label(row, width=28, text=field+": ", anchor='w')
         ent = Entry(row, width=30)
 
@@ -311,9 +316,6 @@ def twitter_func(root, search, latest):
     # close the driver:
     close_driver(driver)
 
-def print_var(var1):
-    print(var1)
-
 #TODO loop this every hour ( time.sleep(3600) )
 #TODO create UI portion for letting a user decide how far away from the geolocation point things are searched
 if __name__ == "__main__":
@@ -333,12 +335,12 @@ if __name__ == "__main__":
     checkBox = Checkbutton(root, text="Show the Latest Tweets only?", variable=var1)
     checkBox.pack(side = LEFT, padx = 5, pady = 5)
 
-    submitBtn = Button(root, text = 'Submit',
+    submitBtn = Button(root, text = 'Search', bg="light green",
        command=(lambda e = ents: twitter_func(root, build_query(e), var1.get())))
-    submitBtn.pack(side = LEFT, padx = 5, pady = 5)
+    submitBtn.pack(side = RIGHT, padx = 5, pady = 5)
 
-    quitBtn = Button(root, text = 'Quit', command = root.quit)
-    quitBtn.pack(side = LEFT, padx = 5, pady = 5)
+    #quitBtn = Button(root, text = 'Quit', command = root.quit)
+    #quitBtn.pack(side = RIGHT, padx = 10, pady = 10)
 
     root.mainloop()
     
