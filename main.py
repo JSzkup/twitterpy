@@ -322,7 +322,6 @@ def twitter_func(root, search, latest, loop):
         close_driver(driver)
 
         if loop == 1:
-            #TODO more testing on hourly running
             time.sleep(3600)
         else:
             break
@@ -331,7 +330,10 @@ def twitter_func(root, search, latest, loop):
 if __name__ == "__main__":
     # initializing Gui
     root = Tk()
+    
+    # adds a title and an icon to the window
     root.title("Twitter Advanced Search Scraper")
+    root.wm_iconbitmap('twitterIcon.ico')
 
     # creates the form based off the fields in the fields tuple
     fields = ('At this location', 'All of these words', 'This exact phrase', 'Any of these words', 'None of these words', 'These hashtags', 'Mentioning these accounts', 'Since this date (yyyy-mm-dd)', 'Until this date (yyyy-mm-dd)')
