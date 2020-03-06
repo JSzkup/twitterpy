@@ -144,6 +144,8 @@ def pull_tweets(driver, regex):
  
         # if there are no search results then the "wait.until" call in the first "try" statement will never happen and it will time out. So we catch that exception and return no html
         tweets = None
+
+    print("Done Searching Tweets")
  
     return tweets
 
@@ -170,22 +172,22 @@ def parse_tweets(unparsedtweet, regexDict):
         else:
             match = match.group(0)
             
-            if match:
-                print(f"{key.upper()}: {match}")
-                if key == 'name':
-                    name = match
-                elif key == 'username':
-                    username = match
-                elif key == 'text':
-                    text = match
-            else:
-                print (f"{key.upper()}: NO {key.upper()}")
-                if key == 'name':
-                    name = "NO NAME"
-                elif key == 'username':
-                    username = "NO USERNAME"
-                elif key == 'text':
-                    text = "NO TEXT"
+        if match:
+            print(f"{key.upper()}: {match}")
+            if key == 'name':
+                name = match
+            elif key == 'username':
+                username = match
+            elif key == 'text':
+                text = match
+        else:
+            print (f"{key.upper()}: NO {key.upper()}")
+            if key == 'name':
+                name = "NO NAME"
+            elif key == 'username':
+                username = "NO USERNAME"
+            elif key == 'text':
+                text = "NO TEXT"
 
     finalTweet = TweetObject(name, username, text)
 
@@ -300,8 +302,9 @@ def build_query(entries):
 
 # twitter and browser functions moved here for UI consistency
 def twitter_func(root, search, latest, loop): 
-  
-    while loop == 1:
+
+    #TODO make this loop less awful
+    while loop == 0 or loop == 1:
         # start a driver for a web browser/compiles regex for parsing tweets
         driver = init_driver()
         regex = init_regex()
@@ -322,9 +325,8 @@ def twitter_func(root, search, latest, loop):
             #TODO more testing on hourly running
             time.sleep(3600)
         else:
-            pass
+            break
 
-#TODO loop this every hour ( time.sleep(3600) )
 #TODO create UI portion for letting a user decide how far away from the geolocation point things are searched
 if __name__ == "__main__":
     # initializing Gui
