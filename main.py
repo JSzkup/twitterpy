@@ -208,15 +208,15 @@ def parse_tweets(unparsedtweet, regexDict):
                           tweet_name VARCHAR(50) NOT NULL,
                           tweet_user VARCHAR(15) NOT NULL,
                           tweet_text VARCHAR(1000) NOT NULL,
-                          PRIMARY KEY (recipe_user),
                         );""")
+                        # PRIMARY KEY (tweet_user)
 
-    cursor.execute("""INSERT INTO SEARCH_QUERY 
+    cursor.execute(f"""INSERT INTO SEARCH_QUERY 
                         (tweet_name, tweet_user, tweet_text) 
                     VALUES 
-                        (1,finalTweet.name),
-                        (2,finalTweet.username),
-                        (3,finalTweet.text);""")
+                        (1,{finalTweet.name}),
+                        (2,{finalTweet.username}),
+                        (3,{finalTweet.text});""")
 
 
 
