@@ -1,0 +1,50 @@
+TWITTER POLICY
+https://twitter.com/robots.txt
+
+SELENIUM
+https://selenium-python.readthedocs.io/
+https://towardsdatascience.com/web-scrape-twitter-by-python-selenium-part-1-b3e2db29051d
+https://allofyourbases.com/2018/01/16/mining-twitter-with-selenium/
+https://towardsdatascience.com/selenium-tweepy-to-scrap-tweets-from-tweeter-and-analysing-sentiments-1804db3478ac
+https://towardsdatascience.com/web-scrape-twitter-by-python-selenium-part-2-c22ae3e78e03
+https://www.jamessilman.co.uk/scrape-tweets-using-selenium/
+https://dev.to/swyx/scraping-my-twitter-social-graph-with-python-and-selenium--hn8
+https://stackoverflow.com/questions/38301993/how-to-disable-java-script-in-chrome-driver-selenium-python
+
+https://stackoverflow.com/questions/32812072/how-to-locate-element-in-selenium-which-has-no-unique-identifier
+https://sqa.stackexchange.com/questions/15863/how-to-select-an-element-whose-id-is-dynamic-and-keeps-changing
+
+TWITTER ADVANCED SEARCH
+https://help.twitter.com/en/using-twitter/twitter-advanced-search
+https://developer.twitter.com/en/docs/tutorials/filtering-tweets-by-location
+https://thinkdisaster.com/2013/07/01/using-advanced-twitter-search-helpful-for-smartphone-and-tablet-searches/
+https://support.statusbrew.com/hc/en-us/articles/360000984045-Search-Twitter-More-Efficiently-with-These-Search-Operators
+
+BEAUTIFUL SOUP
+https://www.crummy.com/software/BeautifulSoup/bs4/doc/
+https://www.vipinajayakumar.com/parsing-text-with-python/
+
+HEADLESS CHROME
+https://duo.com/decipher/driving-headless-chrome-with-python
+
+TWITTER TEXT RULES
+https://www.quora.com/Do-hashtags-count-as-characters-on-Twitter
+https://www.wired.co.uk/article/twitter-character-limit
+
+PYTHON REGEX DICTIONARY
+https://stackoverflow.com/questions/41805522/can-a-python-dictionary-use-re-compile-as-a-key
+
+GEOCODER
+https://geocoder.readthedocs.io/
+
+TKinter
+https://www.tutorialspoint.com/simple-registration-form-using-python-tkinter
+
+TKinter greyed out textbox
+https://stackoverflow.com/questions/51781651/showing-a-greyed-out-default-text-in-a-tk-entry
+https://stackoverflow.com/questions/30491721/how-to-insert-a-temporary-text-in-a-tkinter-entry-widget
+
+Running Query Every Hour
+https://stackoverflow.com/questions/474528/what-is-the-best-way-to-repeatedly-execute-a-function-every-x-seconds-in-python
+
+
