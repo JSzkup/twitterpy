@@ -48,7 +48,7 @@ def init_regex():
         "username": re.compile(r'(?P<username>@[a-zA-Z_0-9]{,15})'),
         #TODO works with (?s) for no apparent reason, gives a deprecation warning, tweets are supposed to only be 280 chars +- handles/usernames (but not hashtags)
         #TODO hacky nonetext fix by increading character count to 1000 in text
-        "text": re.compile(r'((?P<before>(\d(s|m|h|d))|(>@[a-zA-Z_0-9]{,15})|(and \d others))(?P<text>(?s).{,1000}}))', re.DOTALL)
+        "text": re.compile(r'((?P<before>(\d(s|m|h|d))|(>@[a-zA-Z_0-9]{,15})|(and \d others))(?P<text>(?s).{,1000}}))')
     }
     # https://stackoverflow.com/questions/41805522/can-a-python-dictionary-use-re-compile-as-a-key
 
@@ -97,7 +97,7 @@ def search_twitter(driver, keywords, latest):
 
     return
 
-def pull_tweets(driver, regex):
+def pull_tweets(driver, regex, search):
     wait = WebDriverWait(driver, 10)
 
     try:
@@ -121,7 +121,7 @@ def pull_tweets(driver, regex):
             #key, match = parse_tweets(tweets)
 
             for i in tweets:
-                parse_tweets(i.text, regex)
+                parse_tweets(i.text, regex, search)
  
             # https://stackoverflow.com/questions/20986631/how-can-i-scroll-a-web-page-using-selenium-webdriver-in-python
             # https://stackoverflow.com/questions/27003423/staleelementreferenceexception-on-python-selenium
@@ -158,7 +158,7 @@ class TweetObject:
         self.username = ""
         self.text = ""
 
-def parse_tweets(unparsedtweet, regexDict):
+def parse_tweets(unparsedtweet, regexDict, search):
 
     f = open("Unorganized.txt", "a", encoding="utf-8") #, newline='')
     #f.write(unparsedtweet.replace("\n", "\\n"))
@@ -196,28 +196,33 @@ def parse_tweets(unparsedtweet, regexDict):
 
     finalTweet = TweetObject(name, username, text)
 
-
-    sqlLogin = pyodbc.connect("Driver={ODBC Driver 17 for SQL Server};"
-                      "Server=rivsqlb;"
-                      "Database=twitterpy;"
-                      "uid=twpyadmin;pwd=tw!tterapipains")
-
-    cursor = sqlLogin.cursor()
-
-    cursor.execute("""CREATE TABLE SEARCH_QUERY (
-                          tweet_name VARCHAR(50) NOT NULL,
-                          tweet_user VARCHAR(15) NOT NULL,
-                          tweet_text VARCHAR(1000) NOT NULL,
-                        );""")
-                        # PRIMARY KEY (tweet_user)
-
-    cursor.execute(f"""INSERT INTO SEARCH_QUERY 
-                        (tweet_name, tweet_user, tweet_text) 
-                    VALUES 
-                        (1,{finalTweet.name}),
-                        (2,{finalTweet.username}),
-                        (3,{finalTweet.text});""")
-
+    ###TODO separate sql into own function to be called here
+##
+    ##cnxn = pyodbc.connect("Driver={ODBC Driver 17 for SQL Server};"
+    ##                  "Server=rivsqlb;"
+    ##                  "Database=twitterpy;"
+    ##                  "uid=twpyadmin;pwd=tw!tterapipains")
+    ##cursor = cnxn.cursor()
+##
+    ##search = ''.join([str(elem) for elem in search])
+    ##search = str(search.replace(" ", "_"))
+##
+    ##cursor.execute(f"""CREATE TABLE {search} (
+    ##                      tweet_name VARCHAR(50) NOT NULL,
+    ##                      tweet_user VARCHAR(15) NOT NULL,
+    ##                      tweet_text VARCHAR(1000) NOT NULL,
+    ##                    );""")
+    ##                    # PRIMARY KEY (tweet_user)
+    ##cnxn.commit()
+##
+    ##cursor.execute(f"""INSERT INTO {search} 
+    ##                    (tweet_name, tweet_user, tweet_text) 
+    ##                VALUES 
+    ##                    (1,{finalTweet.name}),
+    ##                    (2,{finalTweet.username}),
+    ##                    (3,{finalTweet.text});""")
+    ##cnxn.commit()
+    ##cnxn.close()
 
 
     print (finalTweet.name)
@@ -345,7 +350,7 @@ def twitter_func(root, search, latest, loop):
         search_twitter(driver, search, latest)
 
         # grabs the tweets from the twitter search
-        tweets = pull_tweets(driver, regex)
+        tweets = pull_tweets(driver, regex, search)
 
         # close the driver:
         close_driver(driver)
