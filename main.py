@@ -48,7 +48,7 @@ def init_regex():
         "username": re.compile(r'(?P<username>@[a-zA-Z_0-9]{,15})'),
         #TODO works with (?s) for no apparent reason, gives a deprecation warning, tweets are supposed to only be 280 chars +- handles/usernames (but not hashtags)
         #TODO hacky nonetext fix by increading character count to 1000 in text
-        "text": re.compile(r'((?P<before>(\d(s|m|h|d))|(>@[a-zA-Z_0-9]{,15})|(and \d others))(?P<text>(?s).{,1000}}))')
+        "text": re.compile(r'((?P<before>(\d(s|m|h|d))|(>@[a-zA-Z_0-9]{,15})|(and \d others))(?P<text>(?s).{,1000}))')
     }
     # https://stackoverflow.com/questions/41805522/can-a-python-dictionary-use-re-compile-as-a-key
 
