@@ -168,23 +168,34 @@ def databasing(finalTweet, search):
 
     currently = datetime.today()
     currently = str(currently).replace(" ", "_")
+    currently = currently.strip()
+
+    currently = currently.replace("-", "_")
+    currently = currently.replace(":", "_")
+    currently = currently.replace(".", "_")
     
-    search = (currently + "_" + search)
+    #TODO cut off trailing milliseconds from datetime
+    search = (search + currently)
 
-    print(search)
+    print("Search/Table Name: " + search)
+    print ("Tweet Name: " + finalTweet.name)
+    print ("Tweet Username : " + finalTweet.username)
+    print ("Tweet text : " + finalTweet.text)
 
+    #TODO incorrect syntax on table title
+    # https://doc.4d.com/4Dv15/4D/15.6/Rules-for-naming-tables-and-fields.300-3836655.en.html
     cursor.execute(f"""CREATE TABLE {search} (
-                          tweet_name VARCHAR(50) NOT NULL,
-                          tweet_user VARCHAR(15) NOT NULL,
-                          tweet_text VARCHAR(1000) NOT NULL);""")
+                          tweet_name NVARCHAR(50) NOT NULL,
+                          tweet_user NVARCHAR(15) NOT NULL,
+                          tweet_text NVARCHAR(1000) NOT NULL);""")
     cnxn.commit()
 
     cursor.execute(f"""INSERT INTO {search} 
                         (tweet_name, tweet_user, tweet_text) 
                     VALUES 
-                        (1,{finalTweet.name}),
-                        (2,{finalTweet.username}),
-                        (3,{finalTweet.text});""")
+                        ('{finalTweet.name}'),
+                        ('{finalTweet.username[1:]}'),
+                        ('{finalTweet.text}');""")
     cnxn.commit()
     cnxn.close()
 
@@ -234,9 +245,9 @@ def parse_tweets(unparsedtweet, regexDict, search):
 
     databasing(finalTweet, search)
 
-    print (finalTweet.name)
-    print (finalTweet.username)
-    print (finalTweet.text)
+    ##print (finalTweet.name)
+    ##print (finalTweet.username)
+    ##print (finalTweet.text)
     print("")
 
 
