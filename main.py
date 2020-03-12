@@ -156,12 +156,10 @@ def pull_tweets(driver, regex, search):
 def databasing(finalTweet, search):
     #TODO only connect to sql database once, write everything to it, then close after no tweets are found (cnxn.close())
 
-
     cnxn = pyodbc.connect("Driver={ODBC Driver 17 for SQL Server};"
                       "Server=rivsqlb;"
                       "Database=twitterpy;"
                       "uid=twpyadmin;pwd=tw!tterapipains")
-
 
     cursor = cnxn.cursor()
 
@@ -169,16 +167,18 @@ def databasing(finalTweet, search):
     search = str(search.replace(" ", "_"))
 
     currently = datetime.today()
-    search = (str(currently) + "_" + search)
+    currently = str(currently).replace(" ", "_")
+    
+    search = (currently + "_" + search)
+
+    print(search)
 
     cursor.execute(f"""CREATE TABLE {search} (
                           tweet_name VARCHAR(50) NOT NULL,
                           tweet_user VARCHAR(15) NOT NULL,
-                          tweet_text VARCHAR(1000) NOT NULL,
-                        );""")
+                          tweet_text VARCHAR(1000) NOT NULL);""")
     cnxn.commit()
 
-    #TODO date/time the search to allow for multiple tables of the same name/organization
     cursor.execute(f"""INSERT INTO {search} 
                         (tweet_name, tweet_user, tweet_text) 
                     VALUES 
