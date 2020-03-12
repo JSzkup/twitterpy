@@ -7,16 +7,21 @@ cnxn = pyodbc.connect("Driver={ODBC Driver 17 for SQL Server};"
 
 cursor = cnxn.cursor()
 
+tableName = "BillyTable"
 
-cursor.execute(f"""CREATE TABLE SEARCH_QUERY (
-                      name VARCHAR(50) NOT NULL,
-                      username VARCHAR(15) NOT NULL,
-                      text VARCHAR(1000) NOT NULL,
-                    );""")
+name = "billy"
+username = "@billybee"
+text = "this is what billy would say"
+
+cursor.execute(f"""CREATE TABLE {tableName} (
+                      Name VARCHAR(50) NOT NULL,
+                      Username VARCHAR(15) NOT NULL,
+                      Text VARCHAR(1000) NOT NULL);""")
 cnxn.commit()
 
-cursor.execute(f"""INSERT INTO SEARCH_QUERY (name, username, text) 
-                VALUES ("name", "username", "text");""")
+#DONT USE DOUBLE QUOTES
+cursor.execute(f"""INSERT INTO {tableName} (Name, Username, Text) 
+                VALUES ('{name}', '{username[1:]}', '{text.replace(" ", "_")}');""")
 cnxn.commit()
 
 
