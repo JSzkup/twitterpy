@@ -21,13 +21,14 @@ import geocoder
 # GUI creation
 from tkinter import *
 
-# connecting to database
+# connecting/writing to database
 import pyodbc
 
 # pause program so it doesnt work faster than the driver can update
 # Twitter bot etiquette states you should have at least 1 second in between requests
 import time
 import datetime
+from datetime import datetime
 
 # regular expressions to parse text
 import re
@@ -152,6 +153,41 @@ def pull_tweets(driver, regex, search):
  
     return tweets
 
+def databasing(finalTweet, search):
+    #TODO only connect to sql database once, write everything to it, then close after no tweets are found (cnxn.close())
+
+
+    cnxn = pyodbc.connect("Driver={ODBC Driver 17 for SQL Server};"
+                      "Server=rivsqlb;"
+                      "Database=twitterpy;"
+                      "uid=twpyadmin;pwd=tw!tterapipains")
+
+
+    cursor = cnxn.cursor()
+
+    search = ''.join([str(elem) for elem in search])
+    search = str(search.replace(" ", "_"))
+
+    currently = datetime.today()
+    search = (str(currently) + "_" + search)
+
+    cursor.execute(f"""CREATE TABLE {search} (
+                          tweet_name VARCHAR(50) NOT NULL,
+                          tweet_user VARCHAR(15) NOT NULL,
+                          tweet_text VARCHAR(1000) NOT NULL,
+                        );""")
+    cnxn.commit()
+
+    #TODO date/time the search to allow for multiple tables of the same name/organization
+    cursor.execute(f"""INSERT INTO {search} 
+                        (tweet_name, tweet_user, tweet_text) 
+                    VALUES 
+                        (1,{finalTweet.name}),
+                        (2,{finalTweet.username}),
+                        (3,{finalTweet.text});""")
+    cnxn.commit()
+    cnxn.close()
+
 class TweetObject:
     def __init__(self, name, username, text):
         self.name = ""
@@ -196,41 +232,13 @@ def parse_tweets(unparsedtweet, regexDict, search):
 
     finalTweet = TweetObject(name, username, text)
 
-    ###TODO separate sql into own function to be called here
-##
-    ##cnxn = pyodbc.connect("Driver={ODBC Driver 17 for SQL Server};"
-    ##                  "Server=rivsqlb;"
-    ##                  "Database=twitterpy;"
-    ##                  "uid=twpyadmin;pwd=tw!tterapipains")
-    ##cursor = cnxn.cursor()
-##
-    ##search = ''.join([str(elem) for elem in search])
-    ##search = str(search.replace(" ", "_"))
-##
-    ##cursor.execute(f"""CREATE TABLE {search} (
-    ##                      tweet_name VARCHAR(50) NOT NULL,
-    ##                      tweet_user VARCHAR(15) NOT NULL,
-    ##                      tweet_text VARCHAR(1000) NOT NULL,
-    ##                    );""")
-    ##                    # PRIMARY KEY (tweet_user)
-    ##cnxn.commit()
-##
-    ##cursor.execute(f"""INSERT INTO {search} 
-    ##                    (tweet_name, tweet_user, tweet_text) 
-    ##                VALUES 
-    ##                    (1,{finalTweet.name}),
-    ##                    (2,{finalTweet.username}),
-    ##                    (3,{finalTweet.text});""")
-    ##cnxn.commit()
-    ##cnxn.close()
-
+    databasing(finalTweet, search)
 
     print (finalTweet.name)
     print (finalTweet.username)
     print (finalTweet.text)
     print("")
 
-    return finalTweet
 
 def close_driver(driver):
     # closes chrome web browser
