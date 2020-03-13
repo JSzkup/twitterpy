@@ -1,4 +1,5 @@
-# Scrape Twitter for certain keywords i.e Suffolk Run and determine if the posts are threatening/bad
+# Scrape Twitter for certain keywords i.e Suffolk Run/COVID19
+# then determine if the posts are threatening/bad or are useful to police
 # Create an admin ui to select different keywords/see info
 
 # import selenium for use with Chrome automation
@@ -34,8 +35,8 @@ from datetime import datetime
 import re
 
 
+# opens a headless/invisible automated version of chrome
 def init_driver():
-    # opens a headless/invisible automated version of chrome
     chrome_options = Options()
     chrome_options.add_argument("--headless")
 
@@ -45,8 +46,8 @@ def init_driver():
     return driver
 
 
+# compiling regex query early as dictionary, once for optimization
 def init_regex():
-    # compiling regex query early, once for optimization
     regex = {
         # Needs to find the FIRST one per line
         "name": re.compile(r'(?P<name>[a-zA-Z0-9 _.]{,50})'),
@@ -60,17 +61,16 @@ def init_regex():
     return regex
 
 
+# opens twitter explore page in the browser
 def login_twitter(driver):
 
-    # open the web page in the browser:
     driver.get("https://twitter.com/explore")
     driver.wait = WebDriverWait(driver, 1)
 
     return
 
+
 # scrolls the page/waits for more elements to be visible to scroll again
-
-
 class WaitForMoreThanNElementsToBePresent(object):
     def __init__(self, locator, count):
         self.locator = locator
@@ -84,6 +84,8 @@ class WaitForMoreThanNElementsToBePresent(object):
             return False
 
 
+# types in keywords defined by the user in the ui
+# selects whether latest tweets are searched for
 def search_twitter(driver, keywords, latest):
 
     # checks for the presence of the search box before typing in search query
@@ -108,11 +110,14 @@ def search_twitter(driver, keywords, latest):
     return
 
 
+# finds the tweet on page, then copies its content to a variable
+# scrolls the page to copy more tweets until no more new tweets are found
 def pull_tweets(driver, regex, search):
     wait = WebDriverWait(driver, 10)
 
     try:
-        # wait until the first search result is found. Search results will be tweets, which are html list items and have the class='data-item-id'
+        # wait until the first search result is found Search results will be
+        # tweets which are html list items and have the class='data-item-id'
         wait.until(EC.visibility_of_element_located(
             (By.CSS_SELECTOR, "[aria-label=\"Timeline: Search timeline\"]")))
 
@@ -130,8 +135,6 @@ def pull_tweets(driver, regex, search):
 
             # find number of visible tweets
             number_of_tweets = len(tweets)
-
-            #key, match = parse_tweets(tweets)
 
             for i in tweets:
                 parse_tweets(i.text, regex, search)
@@ -167,6 +170,8 @@ def pull_tweets(driver, regex, search):
     return tweets
 
 
+# puts the current tweet in a database
+# each query is a new table titled after the search/time search was done
 def databasing(finalTweet, search):
     # TODO only connect to sql database once, write everything to it, then close after no tweets are found (cnxn.close())
     ##
@@ -215,6 +220,7 @@ def databasing(finalTweet, search):
     return finalTweet, search
 
 
+# object representing each tweet
 class TweetObject:
     def __init__(self, name, username, text):
         self.name = ""
@@ -222,12 +228,15 @@ class TweetObject:
         self.text = ""
 
 
+# appends tweet to a text file
+# using the regex dict, the tweet block is separated into name/user/text
+# tweets are then sent to be databased
 def parse_tweets(unparsedtweet, regexDict, search):
-
     f = open("Unorganized.txt", "a", encoding="utf-8")  # , newline='')
     #f.write(unparsedtweet.replace("\n", "\\n"))
     # f.write("\n")
-    f.write(unparsedtweet + "/n")
+    f.write(unparsedtweet)
+    f.write("")
 
     f.close()
 
@@ -268,11 +277,12 @@ def parse_tweets(unparsedtweet, regexDict, search):
     print("")
 
 
+# closes chrome web browser until next query
 def close_driver(driver):
-    # closes chrome web browser
     driver.close()
 
 
+# builds the form UI using fields supplied in __main__
 def make_form(root, fields):
 
     entries = {}
@@ -293,6 +303,8 @@ def make_form(root, fields):
     return entries
 
 
+# grabs input from the user in the UI and formats it so twitter can
+# perform advanced search queries
 def build_query(entries):
 
     # final advanced search query put into twitter
@@ -374,12 +386,10 @@ def build_query(entries):
 
     return search_query
 
+
 # twitter and browser functions moved here for UI consistency
-
-
 def twitter_func(root, search, latest, loop):
 
-    # TODO make this loop less awful
     while loop == 0 or loop == 1:
         # start a driver for a web browser/compiles regex for parsing tweets
         driver = init_driver()
