@@ -9,7 +9,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 # chrome wait for element, change chrome options
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.chrome.options import Options  
+from selenium.webdriver.chrome.options import Options
 # error handling
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
@@ -33,42 +33,49 @@ from datetime import datetime
 # regular expressions to parse text
 import re
 
+
 def init_driver():
     # opens a headless/invisible automated version of chrome
-    chrome_options = Options()  
-    chrome_options.add_argument("--headless")  
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
 
-    driver = webdriver.Chrome(executable_path=r'C:\PythonFiles\TwitterScraper\chromedriver.exe', options = chrome_options)  
+    driver = webdriver.Chrome(
+        executable_path=r'C:\Code\Python\twitterpy\chromedriver.exe', options=chrome_options)
 
     return driver
+
 
 def init_regex():
     # compiling regex query early, once for optimization
     regex = {
-        "name": re.compile(r'(?P<name>[a-zA-Z0-9 _.]{,50})'), #Needs to find the FIRST one per line
+        # Needs to find the FIRST one per line
+        "name": re.compile(r'(?P<name>[a-zA-Z0-9 _.]{,50})'),
         "username": re.compile(r'(?P<username>@[a-zA-Z_0-9]{,15})'),
-        #TODO works with (?s) for no apparent reason, gives a deprecation warning, tweets are supposed to only be 280 chars +- handles/usernames (but not hashtags)
-        #TODO hacky nonetext fix by increading character count to 1000 in text
+        # TODO works with (?s) for no apparent reason, gives a deprecation warning, tweets are supposed to only be 280 chars +- handles/usernames (but not hashtags)
+        # TODO hacky nonetext fix by increading character count to 1000 in text
         "text": re.compile(r'((?P<before>(\d(s|m|h|d))|(>@[a-zA-Z_0-9]{,15})|(and \d others))(?P<text>(?s).{,1000}))')
     }
     # https://stackoverflow.com/questions/41805522/can-a-python-dictionary-use-re-compile-as-a-key
 
     return regex
 
+
 def login_twitter(driver):
- 
+
     # open the web page in the browser:
     driver.get("https://twitter.com/explore")
     driver.wait = WebDriverWait(driver, 1)
- 
+
     return
 
 # scrolls the page/waits for more elements to be visible to scroll again
+
+
 class WaitForMoreThanNElementsToBePresent(object):
     def __init__(self, locator, count):
         self.locator = locator
         self.count = count
- 
+
     def __call__(self, driver):
         try:
             elements = EC._find_elements(driver, self.locator)
@@ -78,44 +85,49 @@ class WaitForMoreThanNElementsToBePresent(object):
 
 
 def search_twitter(driver, keywords, latest):
- 
+
     # checks for the presence of the search box before typing in search query
-    box = driver.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[aria-label='Search query']")))
-    driver.find_element_by_css_selector("input[aria-label='Search query']").clear()
+    box = driver.wait.until(EC.presence_of_element_located(
+        (By.CSS_SELECTOR, "input[aria-label='Search query']")))
+    driver.find_element_by_css_selector(
+        "input[aria-label='Search query']").clear()
     # your typed keywords is typed in and entered
     box.send_keys(keywords)
     box.submit()
 
     # initial wait for the search results to load
     driver.implicitly_wait(1)
- 
+
     if latest == 1:
         # clicks "Latest" tab to get most recent tweets
         driver.find_element_by_link_text("Latest").click()
-        driver.wait = WebDriverWait(driver, 1) 
+        driver.wait = WebDriverWait(driver, 1)
     else:
         pass
 
     return
+
 
 def pull_tweets(driver, regex, search):
     wait = WebDriverWait(driver, 10)
 
     try:
         # wait until the first search result is found. Search results will be tweets, which are html list items and have the class='data-item-id'
-        wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "[aria-label=\"Timeline: Search timeline\"]")))
- 
+        wait.until(EC.visibility_of_element_located(
+            (By.CSS_SELECTOR, "[aria-label=\"Timeline: Search timeline\"]")))
+
         # scroll down to the last tweet until there are no more tweets
         while True:
- 
-            # extract all the tweets
-            tweets = driver.find_elements_by_css_selector("article[role='article']")
 
-            ### print tweets to console
-            ##for i in tweets:
-            ##    print(i.text)
-            ##    print("\n\n")
- 
+            # extract all the tweets
+            tweets = driver.find_elements_by_css_selector(
+                "article[role='article']")
+
+            # print tweets to console
+            # for i in tweets:
+            # print(i.text)
+            # print("\n\n")
+
             # find number of visible tweets
             number_of_tweets = len(tweets)
 
@@ -123,81 +135,85 @@ def pull_tweets(driver, regex, search):
 
             for i in tweets:
                 parse_tweets(i.text, regex, search)
- 
+
             # https://stackoverflow.com/questions/20986631/how-can-i-scroll-a-web-page-using-selenium-webdriver-in-python
             # https://stackoverflow.com/questions/27003423/staleelementreferenceexception-on-python-selenium
-            #TODO limit scrolling to x amount of pages/tweets
-            #TODO stops automatically when tweets are found faster than the page can update instead of giving TimeoutException
+            # TODO limit scrolling to x amount of pages/tweets
+            # TODO stops automatically when tweets are found faster than the page can update instead of giving TimeoutException
             # twitter limits scrolling in timeline/favorites to around 3200 tweets
             # scroll after finding a set of tweets so the next set appears
-            driver.execute_script("arguments[0].scrollIntoView(true);", tweets[-1])
+            driver.execute_script(
+                "arguments[0].scrollIntoView(true);", tweets[-1])
 
             # waiting a second to adhere to twitters bot rules
             time.sleep(2)
- 
+
             try:
                 # wait for more tweets to be visible
                 wait.until(WaitForMoreThanNElementsToBePresent(
                     (By.CSS_SELECTOR, "article[role='article']"), number_of_tweets))
- 
+
             except TimeoutException:
                 # if no more are visible the "wait.until" call will timeout. Catch the exception and exit the while loop
                 break
- 
+
     except TimeoutException:
- 
+
         # if there are no search results then the "wait.until" call in the first "try" statement will never happen and it will time out. So we catch that exception and return no html
         tweets = None
 
     print("Done Searching Tweets")
- 
+
     return tweets
 
+
 def databasing(finalTweet, search):
-    #TODO only connect to sql database once, write everything to it, then close after no tweets are found (cnxn.close())
-
-    cnxn = pyodbc.connect("Driver={ODBC Driver 17 for SQL Server};"
-                      "Server=rivsqlb;"
-                      "Database=twitterpy;"
-                      "uid=twpyadmin;pwd=tw!tterapipains")
-
-    cursor = cnxn.cursor()
-
-    search = ''.join([str(elem) for elem in search])
-    search = str(search.replace(" ", "_"))
-
-    currently = datetime.today()
-    currently = str(currently).replace(" ", "_")
-    currently = currently.strip()
-
-    currently = currently.replace("-", "_")
-    currently = currently.replace(":", "_")
-    currently = currently.replace(".", "_")
-    
-    #TODO cut off trailing milliseconds from datetime
-    search = (search + currently)
-
-    print("Search/Table Name: " + search)
-    print ("Tweet Name: " + finalTweet.name)
-    print ("Tweet Username : " + finalTweet.username)
-    print ("Tweet text : " + finalTweet.text)
-
-    #TODO incorrect syntax on table title
+    # TODO only connect to sql database once, write everything to it, then close after no tweets are found (cnxn.close())
+    ##
+    # cnxn = pyodbc.connect("Driver={ODBC Driver 17 for SQL Server};"
+    # "Server=rivsqlb;"
+    # "Database=twitterpy;"
+    # "uid=twpyadmin;pwd=tw!tterapipains")
+    ##
+    ##cursor = cnxn.cursor()
+    ##
+    ##search = ''.join([str(elem) for elem in search])
+    ##search = str(search.replace(" ", "_"))
+    ##
+    ##currently = datetime.today()
+    ##currently = str(currently).replace(" ", "_")
+    ##currently = currently.strip()
+    ##
+    ##currently = currently.replace("-", "_")
+    ##currently = currently.replace(":", "_")
+    ##currently = currently.replace(".", "_")
+    ##
+    # TODO cut off trailing milliseconds from datetime
+    ##search = (search + currently)
+    ##
+    ##print("Search/Table Name: " + search)
+    ##print("Tweet Name: " + finalTweet.name)
+    ##print("Tweet Username : " + finalTweet.username)
+    ##print("Tweet text : " + finalTweet.text)
+    ##
+    # TODO incorrect syntax on table title
     # https://doc.4d.com/4Dv15/4D/15.6/Rules-for-naming-tables-and-fields.300-3836655.en.html
-    cursor.execute(f"""CREATE TABLE {search} (
-                          tweet_name NVARCHAR(50) NOT NULL,
-                          tweet_user NVARCHAR(15) NOT NULL,
-                          tweet_text NVARCHAR(1000) NOT NULL);""")
-    cnxn.commit()
+    # cursor.execute(f"""CREATE TABLE {search} (
+    # tweet_name NVARCHAR(50) NOT NULL,
+    # tweet_user NVARCHAR(15) NOT NULL,
+    # tweet_text NVARCHAR(1000) NOT NULL);""")
+    # cnxn.commit()
+    ##
+    # cursor.execute(f"""INSERT INTO {search}
+    ##                    (tweet_name, tweet_user, tweet_text)
+    # VALUES
+    # ('{finalTweet.name}'),
+    # ('{finalTweet.username[1:]}'),
+    # ('{finalTweet.text}');""")
+    # cnxn.commit()
+    # cnxn.close()
+    return finalTweet, search
 
-    cursor.execute(f"""INSERT INTO {search} 
-                        (tweet_name, tweet_user, tweet_text) 
-                    VALUES 
-                        ('{finalTweet.name}'),
-                        ('{finalTweet.username[1:]}'),
-                        ('{finalTweet.text}');""")
-    cnxn.commit()
-    cnxn.close()
 
 class TweetObject:
     def __init__(self, name, username, text):
@@ -205,25 +221,26 @@ class TweetObject:
         self.username = ""
         self.text = ""
 
+
 def parse_tweets(unparsedtweet, regexDict, search):
 
-    f = open("Unorganized.txt", "a", encoding="utf-8") #, newline='')
+    f = open("Unorganized.txt", "a", encoding="utf-8")  # , newline='')
     #f.write(unparsedtweet.replace("\n", "\\n"))
-    #f.write("\n")
+    # f.write("\n")
     f.write(unparsedtweet + "/n")
 
     f.close()
-    
+
     # Separates each part of a tweet and putting them into respective variables
     for key, tweet in regexDict.items():
         match = tweet.search(unparsedtweet)
         if match == None:
-            #TODO text=notext is hacky, leaves 0 text a lot of the time instead of just preventing None Error
+            # TODO text=notext is hacky, leaves 0 text a lot of the time instead of just preventing None Error
             text = "NO TEXT"
             pass
         else:
             match = match.group(0)
-            
+
         if match:
             print(f"{key.upper()}: {match}")
             if key == 'name':
@@ -233,7 +250,7 @@ def parse_tweets(unparsedtweet, regexDict, search):
             elif key == 'text':
                 text = match
         else:
-            print (f"{key.upper()}: NO {key.upper()}")
+            print(f"{key.upper()}: NO {key.upper()}")
             if key == 'name':
                 name = "NO NAME"
             elif key == 'username':
@@ -255,6 +272,7 @@ def close_driver(driver):
     # closes chrome web browser
     driver.close()
 
+
 def make_form(root, fields):
 
     entries = {}
@@ -266,13 +284,14 @@ def make_form(root, fields):
         lab = Label(row, width=28, text=field+": ", anchor='w')
         ent = Entry(row, width=30)
 
-        row.pack(side = TOP, fill = X, padx = 10 , pady = 5)
-        lab.pack(side = LEFT)
-        ent.pack(side = RIGHT, expand = YES, fill = X)
+        row.pack(side=TOP, fill=X, padx=10, pady=5)
+        lab.pack(side=LEFT)
+        ent.pack(side=RIGHT, expand=YES, fill=X)
 
         entries[field] = ent
 
     return entries
+
 
 def build_query(entries):
 
@@ -285,10 +304,12 @@ def build_query(entries):
     if locWords == "":
         pass
     else:
-        geoLoc = ("geocode:" + str(geoLoc.lat) + "," + str(geoLoc.lng) + ",138km,") #TODO things are searched 85 miles from the geo point
+        # TODO things are searched 85 miles from the geo point
+        geoLoc = ("geocode:" + str(geoLoc.lat) +
+                  "," + str(geoLoc.lng) + ",138km,")
         search_query.append(geoLoc)
         search_query.append(" ")
-    
+
     allWords = str(entries['All of these words'].get())
     if allWords == "":
         pass
@@ -300,7 +321,7 @@ def build_query(entries):
     if exaWords == "":
         pass
     else:
-        exaWords = ("\"" + exaWords +"\"")
+        exaWords = ("\"" + exaWords + "\"")
         search_query.append(exaWords)
         search_query.append(" ")
 
@@ -348,20 +369,22 @@ def build_query(entries):
         search_query.append("until:" + untWords)
         search_query.append(" ")
 
-    listToStr = ''.join([str(elem) for elem in search_query])   
+    listToStr = ''.join([str(elem) for elem in search_query])
     print(listToStr)
 
     return search_query
 
 # twitter and browser functions moved here for UI consistency
-def twitter_func(root, search, latest, loop): 
 
-    #TODO make this loop less awful
+
+def twitter_func(root, search, latest, loop):
+
+    # TODO make this loop less awful
     while loop == 0 or loop == 1:
         # start a driver for a web browser/compiles regex for parsing tweets
         driver = init_driver()
         regex = init_regex()
- 
+
         # log in to twitter (replace username/password with your own)
         login_twitter(driver)
 
@@ -379,37 +402,40 @@ def twitter_func(root, search, latest, loop):
         else:
             break
 
-#TODO create UI portion for letting a user decide how far away from the geolocation point things are searched
+
+# TODO create UI portion for letting a user decide how far away from the geolocation point things are searched
 if __name__ == "__main__":
     # initializing Gui
     root = Tk()
-    
+
     # adds a title and an icon to the window
     root.title("Twitter Advanced Search Scraper")
     root.wm_iconbitmap('twitterIcon.ico')
 
     # creates the form based off the fields in the fields tuple
-    fields = ('At this location', 'All of these words', 'This exact phrase', 'Any of these words', 'None of these words', 'These hashtags', 'Mentioning these accounts', 'Since this date (yyyy-mm-dd)', 'Until this date (yyyy-mm-dd)')
+    fields = ('At this location', 'All of these words', 'This exact phrase', 'Any of these words', 'None of these words',
+              'These hashtags', 'Mentioning these accounts', 'Since this date (yyyy-mm-dd)', 'Until this date (yyyy-mm-dd)')
     ents = make_form(root, fields)
 
     # binds the enter key to the submit button
-    root.bind('<Return>', (lambda event, e = ents: twitter_func(root, build_query(e), var1.get(), var2.get())))
+    root.bind('<Return>', (lambda event, e=ents: twitter_func(
+        root, build_query(e), var1.get(), var2.get())))
 
     # checkbox to allow for showing of only the latest tweets (OFF by default)
     var1 = IntVar()
-    checkBox = Checkbutton(root, text="Show the Latest Tweets only?", variable=var1)
-    checkBox.pack(side = LEFT, padx = 5, pady = 5)
+    checkBox = Checkbutton(
+        root, text="Show the Latest Tweets only?", variable=var1)
+    checkBox.pack(side=LEFT, padx=5, pady=5)
 
     var2 = IntVar()
     checkBox = Checkbutton(root, text="Run Hourly?", variable=var2)
-    checkBox.pack(side = LEFT, padx = 5, pady = 5)
+    checkBox.pack(side=LEFT, padx=5, pady=5)
 
-    submitBtn = Button(root, text = 'Search', bg="light green",
-       command=(lambda e = ents: twitter_func(root, build_query(e), var1.get(), var2.get())))
-    submitBtn.pack(side = RIGHT, padx = 5, pady = 5)
+    submitBtn = Button(root, text='Search', bg="light green",
+                       command=(lambda e=ents: twitter_func(root, build_query(e), var1.get(), var2.get())))
+    submitBtn.pack(side=RIGHT, padx=5, pady=5)
 
     #quitBtn = Button(root, text = 'Quit', command = root.quit)
     #quitBtn.pack(side = RIGHT, padx = 10, pady = 10)
 
     root.mainloop()
-    

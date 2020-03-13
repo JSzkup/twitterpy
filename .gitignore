@@ -3,3 +3,6 @@ Unorganized.txt
 Organized.txt
 .selenium/
 .vscode/
+env/
+chromedriver.exe
+settings.json
