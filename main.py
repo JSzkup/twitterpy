@@ -52,9 +52,8 @@ def init_regex():
         # Needs to find the FIRST one per line
         "name": re.compile(r'(?P<name>[a-zA-Z0-9 _.]{,50})'),
         "username": re.compile(r'(?P<username>@[a-zA-Z_0-9]{,15})'),
-        # TODO works with (?s) for no apparent reason, gives a deprecation warning, tweets are supposed to only be 280 chars +- handles/usernames (but not hashtags)
         # TODO hacky nonetext fix by increading character count to 1000 in text
-        "text": re.compile(r'((?P<before>(\d(s|m|h|d))|(>@[a-zA-Z_0-9]{,15})|(and \d others))(?P<text>.{,1000}))', re.DOTALL)
+        "text": re.compile(r'((?P<before>(\d(s|m|h|d))|(>@[a-zA-Z_0-9]{,15})|(and \d others))(?P<text>.{,1000}))', re.DOTALL|re.MULTILINE)
     }
     # https://stackoverflow.com/questions/41805522/can-a-python-dictionary-use-re-compile-as-a-key
 
@@ -243,10 +242,9 @@ def parse_tweets(unparsedtweet, regexDict, search):
     # Separates each part of a tweet and putting them into respective variables
     for key, tweet in regexDict.items():
         match = tweet.search(unparsedtweet)
-        if match == None:
+        if match is None:
             # TODO text=notext is hacky, leaves 0 text a lot of the time instead of just preventing None Error
-            text = "NO TEXT"
-            pass
+            text = "TEXT CANNOT BE FOUND"
         else:
             match = match.group(0)
 
@@ -283,12 +281,14 @@ def close_driver(driver):
 
 
 # builds the form UI using fields supplied in __main__
-def make_form(root, fields):
+def make_form(root, FIELDS):
 
     entries = {}
 
+    #TODO greyed out examples in input fields
+
     # for every field, create a row in the form for entry
-    for field in fields:
+    for field in FIELDS:
         row = Frame(root)
         # Each field gets labeled with its field name
         lab = Label(row, width=28, text=field+": ", anchor='w')
@@ -316,7 +316,7 @@ def build_query(entries):
     if locWords == "":
         pass
     else:
-        # TODO things are searched 85 miles from the geo point
+        # things are searched 85 miles from the geo point
         geoLoc = ("geocode:" + str(geoLoc.lat) +
                   "," + str(geoLoc.lng) + ",138km,")
         search_query.append(geoLoc)
@@ -390,7 +390,7 @@ def build_query(entries):
 # twitter and browser functions moved here for UI consistency
 def twitter_func(root, search, latest, loop):
 
-    while loop == 0 or loop == 1:
+    while loop in (0, 1):
         # start a driver for a web browser/compiles regex for parsing tweets
         driver = init_driver()
         regex = init_regex()
@@ -413,7 +413,8 @@ def twitter_func(root, search, latest, loop):
             break
 
 
-# TODO create UI portion for letting a user decide how far away from the geolocation point things are searched
+#TODO create UI portion for letting a user decide how far away from the geolocation point things are searched
+#TODO show tweets in the GUI
 if __name__ == "__main__":
     # initializing Gui
     root = Tk()
@@ -423,9 +424,9 @@ if __name__ == "__main__":
     root.wm_iconbitmap('twitterIcon.ico')
 
     # creates the form based off the fields in the fields tuple
-    fields = ('At this location', 'All of these words', 'This exact phrase', 'Any of these words', 'None of these words',
+    FIELDS = ('At this location', 'All of these words', 'This exact phrase', 'Any of these words', 'None of these words',
               'These hashtags', 'Mentioning these accounts', 'Since this date (yyyy-mm-dd)', 'Until this date (yyyy-mm-dd)')
-    ents = make_form(root, fields)
+    ents = make_form(root, FIELDS)
 
     # binds the enter key to the submit button
     root.bind('<Return>', (lambda event, e=ents: twitter_func(
