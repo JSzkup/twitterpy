@@ -1,7 +1,7 @@
 {
-    "python.pythonPath": "c:\\Code\\Python\\twitterpy\\env\\Scripts\\python.exe",
+    "python.pythonPath": ".selenium\\Scripts\\python.exe",
     "python.linting.enabled": true,
-    "python.linting.pylintEnabled": false,
+    "python.linting.pylintEnabled": true,
     "python.linting.pycodestyleEnabled": false,
-    "python.linting.flake8Enabled": true,
+    "python.linting.flake8Enabled": false,
 }
