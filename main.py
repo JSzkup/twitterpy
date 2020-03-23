@@ -41,7 +41,7 @@ def init_driver():
     chrome_options.add_argument("--headless")
 
     driver = webdriver.Chrome(
-        executable_path=r'C:\PythonFiles\TwitterScraper\chromedriver.exe', options=chrome_options)
+        executable_path=r'chromedriver.exe', options=chrome_options)
 
     return driver
 
@@ -53,7 +53,7 @@ def init_regex():
         "name": re.compile(r'(?P<name>[a-zA-Z0-9 _.]{,50})'),
         "username": re.compile(r'(?P<username>@[a-zA-Z_0-9]{,15})'),
         # TODO hacky nonetext fix by increading character count to 1000 in text
-        "text": re.compile(r'((?P<before>(\d(s|m|h|d))|(>@[a-zA-Z_0-9]{,15})|(and \d others))(?P<text>.{,1000}))', re.DOTALL|re.MULTILINE)
+        "text": re.compile(r'((?P<before>(\d(s|m|h|d))|(>@[a-zA-Z_0-9]{,15})|(and \d others))(?P<text>.{,1000}))', re.DOTALL | re.MULTILINE)
     }
     # https://stackoverflow.com/questions/41805522/can-a-python-dictionary-use-re-compile-as-a-key
 
@@ -127,11 +127,6 @@ def pull_tweets(driver, regex, search):
             tweets = driver.find_elements_by_css_selector(
                 "article[role='article']")
 
-            # print tweets to console
-            # for i in tweets:
-            # print(i.text)
-            # print("\n\n")
-
             # find number of visible tweets
             number_of_tweets = len(tweets)
 
@@ -171,54 +166,54 @@ def pull_tweets(driver, regex, search):
 
 # puts the current tweet in a database
 # each query is a new table titled after the search/time search was done
-def databasing(name, username, text, search):
-    #TODO only connect to sql database once, write everything to it, then close after no tweets are found (cnxn.close())
-    
-    cnxn = pyodbc.connect("Driver={ODBC Driver 17 for SQL Server};"
-    "Server=rivsqlb;"
-    "Database=twitterpy;"
-    "uid=twpyadmin;pwd=tw!tterapipains")
-    
-    cursor = cnxn.cursor()
-    
-    search = ''.join([str(elem) for elem in search])
-    search = str(search.replace(" ", "_"))
-    
-    currently = datetime.today()
-    currently = str(currently).replace(" ", "_")
-    currently = currently.strip()
-    
-    currently = currently.replace("-", "_")
-    currently = currently.replace(":", "_")
-    currently = currently.replace(".", "_")
-    
-    #TODO cut off trailing milliseconds from datetime
-    search = (search + currently)
+# def databasing(name, username, text, search):
+    # TODO only connect to sql database once, write everything to it, then close after no tweets are found (cnxn.close())
 
-    text = text.replace(",", "(comma)")
-    
-    print("Search/Table Name: " + search)
-    print("Tweet Name: " + name)
-    print("Tweet Username: " + username)
-    print("Tweet text: " + text)
-    
-    #TODO incorrect syntax on table title
-    #https://doc.4d.com/4Dv15/4D/15.6/Rules-for-naming-tables-and-fields.300-3836655.en.html
-    cursor.execute(f"""CREATE TABLE {search} (
-                        tweet_name NVARCHAR(60) NOT NULL,
-                        tweet_user NVARCHAR(20) NOT NULL,
-                        tweet_text NVARCHAR(1000) NOT NULL);""")
-    cnxn.commit()
-    
-    cursor.execute(f"""INSERT INTO {search}
-                        (tweet_name, tweet_user, tweet_text)
-                    VALUES
-                    ('{name}'),
-                    ('{username[1:]}'),
-                    ('{text}');""")
-    cnxn.commit()
-    cnxn.close()
-    return search
+    # cnxn = pyodbc.connect("Driver={ODBC Driver 17 for SQL Server};"
+    # r"Server=JON\SQLEXPRESS;"
+    # "Database=twitterpy;"
+    # "Trusted_Connection=yes")
+##
+    ##cursor = cnxn.cursor()
+##
+    ##search = ''.join([str(elem) for elem in search])
+    ##search = str(search.replace(" ", "_"))
+##
+    ##currently = datetime.today()
+    ##currently = str(currently).replace(" ", "_")
+    ##currently = currently.strip()
+##
+    ##currently = currently.replace("-", "_")
+    ##currently = currently.replace(":", "_")
+    ##currently = currently.replace(".", "_")
+##
+    # TODO cut off trailing milliseconds from datetime
+    ##search = (search + currently)
+##
+    ##text = text.replace(",", "(comma)")
+##
+    ##print("Search/Table Name: " + search)
+    ##print("Tweet Name: " + name)
+    ##print("Tweet Username: " + username)
+    ##print("Tweet text: " + text)
+##
+    # TODO incorrect syntax on table title
+    # https://doc.4d.com/4Dv15/4D/15.6/Rules-for-naming-tables-and-fields.300-3836655.en.html
+    # cursor.execute(f"""CREATE TABLE {search} (
+    # tweet_name NVARCHAR(60) NOT NULL,
+    # tweet_user NVARCHAR(20) NOT NULL,
+    # tweet_text NVARCHAR(1000) NOT NULL);""")
+    # cnxn.commit()
+##
+    # cursor.execute(f"""INSERT INTO {search}
+    ##                    (tweet_name, tweet_user, tweet_text)
+    # VALUES
+    # ('{name}'),
+    # ('{username[1:]}'),
+    # ('{text}');""")
+    # cnxn.commit()
+    # cnxn.close()
+    # return search
 
 
 # object representing each tweet
@@ -233,12 +228,9 @@ class TweetObject:
 # using the regex dict, the tweet block is separated into name/user/text
 # tweets are then sent to be databased
 def parse_tweets(unparsedtweet, regexDict, search):
-    f = open("Unorganized.txt", "a", encoding="utf-8")  # , newline='')
-    #f.write(unparsedtweet.replace("\n", "\\n"))
-    # f.write("\n")
+    f = open("foundTweets.txt", "a", encoding="utf-8")
     f.write(unparsedtweet)
-    f.write("")
-
+    f.write("\n")
     f.close()
 
     # Separates each part of a tweet and putting them into respective variables
@@ -269,11 +261,13 @@ def parse_tweets(unparsedtweet, regexDict, search):
 
     finalTweet = TweetObject(name, username, text)
 
+    # f.write(unparsedtweet)
+
     name = finalTweet.name
     username = finalTweet.username
     text = finalTweet.text
 
-    databasing(name, username, text, search)
+    #databasing(name, username, text, search)
 
     ##print (finalTweet.name)
     ##print (finalTweet.username)
@@ -291,7 +285,7 @@ def make_form(root, FIELDS):
 
     entries = {}
 
-    #TODO greyed out examples in input fields
+    # TODO greyed out examples in input fields
 
     # for every field, create a row in the form for entry
     for field in FIELDS:
@@ -419,8 +413,8 @@ def twitter_func(root, search, latest, loop):
             break
 
 
-#TODO create UI portion for letting a user decide how far away from the geolocation point things are searched
-#TODO show tweets in the GUI
+# TODO create UI portion for letting a user decide how far away from the geolocation point things are searched
+# TODO show tweets in the GUI
 if __name__ == "__main__":
     # initializing Gui
     root = Tk()

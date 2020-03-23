@@ -1,7 +1,7 @@
 {
-    "python.pythonPath": ".selenium\\Scripts\\python.exe",
+    "python.pythonPath": "env\\Scripts\\python.exe",
     "python.linting.enabled": true,
-    "python.linting.pylintEnabled": true,
+    "python.linting.pylintEnabled": false,
     "python.linting.pycodestyleEnabled": false,
-    "python.linting.flake8Enabled": false,
+    "python.linting.flake8Enabled": true,
 }
