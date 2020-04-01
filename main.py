@@ -456,10 +456,15 @@ if __name__ == "__main__":
 
     options.pack()
 
+    # adds scrollbae ro outputBox
+    scroll = Scrollbar(root)
+    scroll.pack(side=RIGHT, fill=Y)
+
     # TODO maybe put this in a frame and have it only appear after a search to keep the UI simple
     # TODO pack it after search is pressed/enter key
     # Large text box to show tweets in GUI once they are pulled
-    outputBox = Text(root, bg="white", height=20)
+    outputBox = Text(root, bg="white", height=20,
+                     wrap=NONE, yscrollcommand=scroll.set)
     outputBox.pack(side=BOTTOM, padx=5, pady=5, fill=X)
 
     root.mainloop()
