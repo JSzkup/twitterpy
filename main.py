@@ -20,6 +20,7 @@ from selenium.common.exceptions import StaleElementReferenceException
 import geocoder
 
 # GUI creation
+# TODO when everything is done import only needed things from tkinter
 from tkinter import *
 
 # connecting/writing to database
@@ -228,9 +229,9 @@ class TweetObject:
 # using the regex dict, the tweet block is separated into name/user/text
 # tweets are then sent to be databased
 def parse_tweets(unparsedtweet, regexDict, search):
-    f = open("foundTweets.txt", "a", encoding="utf-8")
-    f.write(unparsedtweet)
-    f.write("\n")
+    f = open("foundTweets.txt", "a", encoding="utf-8", newline="\n")
+    # TODO more clearly separate tweets within the text file
+    f.write("\n" + unparsedtweet + r"\n")
     f.close()
 
     # Separates each part of a tweet and putting them into respective variables
@@ -415,6 +416,7 @@ def twitter_func(root, search, latest, loop):
 
 # TODO create UI portion for letting a user decide how far away from the geolocation point things are searched
 # TODO show tweets in the GUI
+# TODO add consolve view to bottom of gui to show tweets in gui
 if __name__ == "__main__":
     # initializing Gui
     root = Tk()
@@ -432,21 +434,32 @@ if __name__ == "__main__":
     root.bind('<Return>', (lambda event, e=ents: twitter_func(
         root, build_query(e), var1.get(), var2.get())))
 
+    # frame created to separate options from text input and output
+    options = Frame(root)
+
     # checkbox to allow for showing of only the latest tweets (OFF by default)
     var1 = IntVar()
     checkBox = Checkbutton(
-        root, text="Show the Latest Tweets only?", variable=var1)
+        options, text="Show the Latest Tweets only?", variable=var1)
     checkBox.pack(side=LEFT, padx=5, pady=5)
 
     var2 = IntVar()
-    checkBox = Checkbutton(root, text="Run Hourly?", variable=var2)
+    checkBox = Checkbutton(options, text="Run Hourly?", variable=var2)
     checkBox.pack(side=LEFT, padx=5, pady=5)
 
-    submitBtn = Button(root, text='Search', bg="light green",
+    padding = Label(options)
+    padding.pack(side=LEFT, padx=140)
+
+    submitBtn = Button(options, text='Search', bg="light green",
                        command=(lambda e=ents: twitter_func(root, build_query(e), var1.get(), var2.get())))
     submitBtn.pack(side=RIGHT, padx=5, pady=5)
 
-    #quitBtn = Button(root, text = 'Quit', command = root.quit)
-    #quitBtn.pack(side = RIGHT, padx = 10, pady = 10)
+    options.pack()
+
+    # TODO maybe put this in a frame and have it only appear after a search to keep the UI simple
+    # TODO pack it after search is pressed/enter key
+    # Large text box to show tweets in GUI once they are pulled
+    outputBox = Text(root, bg="white", height=20)
+    outputBox.pack(side=BOTTOM, padx=5, pady=5, fill=X)
 
     root.mainloop()
