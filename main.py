@@ -112,7 +112,7 @@ def search_twitter(driver, keywords, latest):
 
 # finds the tweet on page, then copies its content to a variable
 # scrolls the page to copy more tweets until no more new tweets are found
-def pull_tweets(driver, regex, search):
+def pull_tweets(root, driver, regex, search):
     wait = WebDriverWait(driver, 10)
 
     try:
@@ -120,6 +120,9 @@ def pull_tweets(driver, regex, search):
         # tweets which are html list items and have the class='data-item-id'
         wait.until(EC.visibility_of_element_located(
             (By.CSS_SELECTOR, "[aria-label=\"Timeline: Search timeline\"]")))
+
+        # TODO creates a new text box on each program run
+        showOutput = make_outputBox(root)
 
         # scroll down to the last tweet until there are no more tweets
         while True:
@@ -132,7 +135,7 @@ def pull_tweets(driver, regex, search):
             number_of_tweets = len(tweets)
 
             for i in tweets:
-                parse_tweets(i.text, regex, search)
+                parse_tweets(showOutput, i.text, regex, search)
 
             # https://stackoverflow.com/questions/20986631/how-can-i-scroll-a-web-page-using-selenium-webdriver-in-python
             # https://stackoverflow.com/questions/27003423/staleelementreferenceexception-on-python-selenium
@@ -228,7 +231,8 @@ class TweetObject:
 # appends tweet to a text file
 # using the regex dict, the tweet block is separated into name/user/text
 # tweets are then sent to be databased
-def parse_tweets(unparsedtweet, regexDict, search):
+# TODO pass outputbox
+def parse_tweets(outputBox, unparsedtweet, regexDict, search):
     f = open("foundTweets.txt", "a", encoding="utf-8", newline="\n")
     # TODO more clearly separate tweets within the text file
     f.write("\n" + unparsedtweet + r"\n")
@@ -259,6 +263,10 @@ def parse_tweets(unparsedtweet, regexDict, search):
                 username = "NO USERNAME"
             elif key == 'text':
                 text = "NO TEXT"
+
+    outputBox.insert(INSERT, f"{name} \n {username} \n {text} \n")
+    # TODO more testing to add rpoper spacing between tweets
+    #outputBox.insert(INSERT, "  ")
 
     finalTweet = TweetObject(name, username, text)
 
@@ -304,8 +312,21 @@ def make_form(root, FIELDS):
     return entries
 
 
+def make_outputBox(root):
+
+    scroll = Scrollbar(root)
+    scroll.pack(side=RIGHT, fill=Y)
+
+    outputBox = Text(root, bg="white", height=20,
+                     wrap=NONE, yscrollcommand=scroll.set)
+    outputBox.pack(side=BOTTOM, padx=5, pady=5, fill=X)
+
+    return outputBox
+
 # grabs input from the user in the UI and formats it so twitter can
 # perform advanced search queries
+
+
 def build_query(entries):
 
     # final advanced search query put into twitter
@@ -403,7 +424,7 @@ def twitter_func(root, search, latest, loop):
         search_twitter(driver, search, latest)
 
         # grabs the tweets from the twitter search
-        tweets = pull_tweets(driver, regex, search)
+        tweets = pull_tweets(root, driver, regex, search)
 
         # close the driver:
         close_driver(driver)
@@ -457,14 +478,14 @@ if __name__ == "__main__":
     options.pack()
 
     # adds scrollbae ro outputBox
-    scroll = Scrollbar(root)
-    scroll.pack(side=RIGHT, fill=Y)
+    ##scroll = Scrollbar(root)
+    ##scroll.pack(side=RIGHT, fill=Y)
 
     # TODO maybe put this in a frame and have it only appear after a search to keep the UI simple
     # TODO pack it after search is pressed/enter key
     # Large text box to show tweets in GUI once they are pulled
-    outputBox = Text(root, bg="white", height=20,
-                     wrap=NONE, yscrollcommand=scroll.set)
-    outputBox.pack(side=BOTTOM, padx=5, pady=5, fill=X)
+    # outputBox = Text(root, bg="white", height=20,
+    # wrap=NONE, yscrollcommand=scroll.set)
+    ##outputBox.pack(side=BOTTOM, padx=5, pady=5, fill=X)
 
     root.mainloop()
