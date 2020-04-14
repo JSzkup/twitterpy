@@ -228,14 +228,13 @@ class TweetObject:
         self.text = ""
 
 
-# appends tweet to a text file
-# using the regex dict, the tweet block is separated into name/user/text
-# tweets are then sent to be databased
-# TODO pass outputbox
+# appends tweet to a text file and splits them by part
 def parse_tweets(outputBox, unparsedtweet, regexDict, search):
     f = open("foundTweets.txt", "a", encoding="utf-8", newline="\n")
     # TODO more clearly separate tweets within the text file
-    f.write("\n" + unparsedtweet + r"\n")
+    # TODO check timeline for older version that worked a bit better
+    f.write("\n" + unparsedtweet + "\n")
+    f.write("\n" + "--------------------------------------------------" + "\n")
     f.close()
 
     # Separates each part of a tweet and putting them into respective variables
@@ -266,7 +265,7 @@ def parse_tweets(outputBox, unparsedtweet, regexDict, search):
 
     outputBox.insert(INSERT, f"{name} \n {username} \n {text} \n")
     # TODO more testing to add rpoper spacing between tweets
-    #outputBox.insert(INSERT, "  ")
+    outputBox.insert(INSERT, "\n")
 
     finalTweet = TweetObject(name, username, text)
 
@@ -412,6 +411,7 @@ def build_query(entries):
 # twitter and browser functions moved here for UI consistency
 def twitter_func(root, search, latest, loop):
 
+    # TODO show an indicator that the program is running while its "frozen" during tweet finding
     while loop in (0, 1):
         # start a driver for a web browser/compiles regex for parsing tweets
         driver = init_driver()
