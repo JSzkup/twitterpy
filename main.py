@@ -53,7 +53,6 @@ def init_regex():
         # Needs to find the FIRST one per line
         "name": re.compile(r'(?P<name>[a-zA-Z0-9 _.]{,50})'),
         "username": re.compile(r'(?P<username>@[a-zA-Z_0-9]{,15})'),
-        # TODO hacky nonetext fix by increading character count to 1000 in text
         "text": re.compile(r'((?P<before>(\d(s|m|h|d))|(>@[a-zA-Z_0-9]{,15})|(and \d others))(?P<text>.{,1000}))', re.DOTALL | re.MULTILINE)
     }
     # https://stackoverflow.com/questions/41805522/can-a-python-dictionary-use-re-compile-as-a-key
@@ -112,7 +111,7 @@ def search_twitter(driver, keywords, latest):
 
 # finds the tweet on page, then copies its content to a variable
 # scrolls the page to copy more tweets until no more new tweets are found
-def pull_tweets(root, driver, regex, search):
+def pull_tweets(root, driver, regex, search, showOutput):
     wait = WebDriverWait(driver, 10)
 
     try:
@@ -120,9 +119,6 @@ def pull_tweets(root, driver, regex, search):
         # tweets which are html list items and have the class='data-item-id'
         wait.until(EC.visibility_of_element_located(
             (By.CSS_SELECTOR, "[aria-label=\"Timeline: Search timeline\"]")))
-
-        # TODO creates a new text box on each program run
-        showOutput = make_outputBox(root)
 
         # scroll down to the last tweet until there are no more tweets
         while True:
@@ -178,28 +174,28 @@ def pull_tweets(root, driver, regex, search):
     # "Database=twitterpy;"
     # "Trusted_Connection=yes")
 ##
-    ##cursor = cnxn.cursor()
+    # cursor = cnxn.cursor()
 ##
-    ##search = ''.join([str(elem) for elem in search])
-    ##search = str(search.replace(" ", "_"))
+    # search = ''.join([str(elem) for elem in search])
+    # search = str(search.replace(" ", "_"))
 ##
-    ##currently = datetime.today()
-    ##currently = str(currently).replace(" ", "_")
-    ##currently = currently.strip()
+    # currently = datetime.today()
+    # currently = str(currently).replace(" ", "_")
+    # currently = currently.strip()
 ##
-    ##currently = currently.replace("-", "_")
-    ##currently = currently.replace(":", "_")
-    ##currently = currently.replace(".", "_")
+    # currently = currently.replace("-", "_")
+    # currently = currently.replace(":", "_")
+    # currently = currently.replace(".", "_")
 ##
     # TODO cut off trailing milliseconds from datetime
-    ##search = (search + currently)
+    # search = (search + currently)
 ##
-    ##text = text.replace(",", "(comma)")
+    # text = text.replace(",", "(comma)")
 ##
-    ##print("Search/Table Name: " + search)
-    ##print("Tweet Name: " + name)
-    ##print("Tweet Username: " + username)
-    ##print("Tweet text: " + text)
+    # print("Search/Table Name: " + search)
+    # print("Tweet Name: " + name)
+    # print("Tweet Username: " + username)
+    # print("Tweet text: " + text)
 ##
     # TODO incorrect syntax on table title
     # https://doc.4d.com/4Dv15/4D/15.6/Rules-for-naming-tables-and-fields.300-3836655.en.html
@@ -210,7 +206,7 @@ def pull_tweets(root, driver, regex, search):
     # cnxn.commit()
 ##
     # cursor.execute(f"""INSERT INTO {search}
-    ##                    (tweet_name, tweet_user, tweet_text)
+    # (tweet_name, tweet_user, tweet_text)
     # VALUES
     # ('{name}'),
     # ('{username[1:]}'),
@@ -263,6 +259,7 @@ def parse_tweets(outputBox, unparsedtweet, regexDict, search):
             elif key == 'text':
                 text = "NO TEXT"
 
+    # TODO use something to split apart each run of the program within the GUI
     outputBox.insert(INSERT, f"{name} \n {username} \n {text} \n")
     # TODO more testing to add rpoper spacing between tweets
     outputBox.insert(INSERT, "\n")
@@ -275,11 +272,7 @@ def parse_tweets(outputBox, unparsedtweet, regexDict, search):
     username = finalTweet.username
     text = finalTweet.text
 
-    #databasing(name, username, text, search)
-
-    ##print (finalTweet.name)
-    ##print (finalTweet.username)
-    ##print (finalTweet.text)
+    # databasing(name, username, text, search)
     print("")
 
 
@@ -313,6 +306,7 @@ def make_form(root, FIELDS):
 
 def make_outputBox(root):
 
+    # TODO scrollbar not able to be clicked and dragged
     scroll = Scrollbar(root)
     scroll.pack(side=RIGHT, fill=Y)
 
@@ -409,7 +403,7 @@ def build_query(entries):
 
 
 # twitter and browser functions moved here for UI consistency
-def twitter_func(root, search, latest, loop):
+def twitter_func(root, search, latest, loop, showOutput):
 
     # TODO show an indicator that the program is running while its "frozen" during tweet finding
     while loop in (0, 1):
@@ -424,7 +418,7 @@ def twitter_func(root, search, latest, loop):
         search_twitter(driver, search, latest)
 
         # grabs the tweets from the twitter search
-        tweets = pull_tweets(root, driver, regex, search)
+        tweets = pull_tweets(root, driver, regex, search, showOutput)
 
         # close the driver:
         close_driver(driver)
@@ -438,6 +432,7 @@ def twitter_func(root, search, latest, loop):
 # TODO create UI portion for letting a user decide how far away from the geolocation point things are searched
 # TODO show tweets in the GUI
 # TODO add consolve view to bottom of gui to show tweets in gui
+# TODO refactor, too many things being passed into each function
 if __name__ == "__main__":
     # initializing Gui
     root = Tk()
@@ -451,9 +446,11 @@ if __name__ == "__main__":
               'These hashtags', 'Mentioning these accounts', 'Since this date (yyyy-mm-dd)', 'Until this date (yyyy-mm-dd)')
     ents = make_form(root, FIELDS)
 
+    showOutput = make_outputBox(root)
+
     # binds the enter key to the submit button
     root.bind('<Return>', (lambda event, e=ents: twitter_func(
-        root, build_query(e), var1.get(), var2.get())))
+        root, build_query(e), var1.get(), var2.get(), showOutput)))
 
     # frame created to separate options from text input and output
     options = Frame(root)
@@ -478,14 +475,14 @@ if __name__ == "__main__":
     options.pack()
 
     # adds scrollbae ro outputBox
-    ##scroll = Scrollbar(root)
-    ##scroll.pack(side=RIGHT, fill=Y)
+    # scroll = Scrollbar(root)
+    # scroll.pack(side=RIGHT, fill=Y)
 
     # TODO maybe put this in a frame and have it only appear after a search to keep the UI simple
     # TODO pack it after search is pressed/enter key
     # Large text box to show tweets in GUI once they are pulled
     # outputBox = Text(root, bg="white", height=20,
     # wrap=NONE, yscrollcommand=scroll.set)
-    ##outputBox.pack(side=BOTTOM, padx=5, pady=5, fill=X)
+    # outputBox.pack(side=BOTTOM, padx=5, pady=5, fill=X)
 
     root.mainloop()
