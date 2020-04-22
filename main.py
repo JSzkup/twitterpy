@@ -227,8 +227,6 @@ class TweetObject:
 # appends tweet to a text file and splits them by part
 def parse_tweets(outputBox, unparsedtweet, regexDict, search):
     f = open("foundTweets.txt", "a", encoding="utf-8", newline="\n")
-    # TODO more clearly separate tweets within the text file
-    # TODO check timeline for older version that worked a bit better
     f.write("\n" + unparsedtweet + "\n")
     f.write("\n" + "--------------------------------------------------" + "\n")
     f.close()
@@ -237,7 +235,6 @@ def parse_tweets(outputBox, unparsedtweet, regexDict, search):
     for key, tweet in regexDict.items():
         match = tweet.search(unparsedtweet)
         if match is None:
-            # TODO text=notext is hacky, leaves 0 text a lot of the time instead of just preventing None Error
             text = "TEXT CANNOT BE FOUND"
         else:
             match = match.group(0)
@@ -259,9 +256,7 @@ def parse_tweets(outputBox, unparsedtweet, regexDict, search):
             elif key == 'text':
                 text = "NO TEXT"
 
-    # TODO use something to split apart each run of the program within the GUI
     outputBox.insert(INSERT, f"{name} \n {username} \n {text} \n")
-    # TODO more testing to add rpoper spacing between tweets
     outputBox.insert(INSERT, "\n")
 
     finalTweet = TweetObject(name, username, text)
@@ -333,7 +328,7 @@ def build_query(entries):
     else:
         # things are searched 85 miles from the geo point
         geoLoc = ("geocode:" + str(geoLoc.lat) +
-                  "," + str(geoLoc.lng) + ",138km,")
+                  "," + str(geoLoc.lng) + ",50km,")
         search_query.append(geoLoc)
         search_query.append(" ")
 
@@ -429,9 +424,6 @@ def twitter_func(root, search, latest, loop, showOutput):
             break
 
 
-# TODO create UI portion for letting a user decide how far away from the geolocation point things are searched
-# TODO show tweets in the GUI
-# TODO add consolve view to bottom of gui to show tweets in gui
 # TODO refactor, too many things being passed into each function
 if __name__ == "__main__":
     # initializing Gui
@@ -473,16 +465,5 @@ if __name__ == "__main__":
     submitBtn.pack(side=RIGHT, padx=5, pady=5)
 
     options.pack()
-
-    # adds scrollbae ro outputBox
-    # scroll = Scrollbar(root)
-    # scroll.pack(side=RIGHT, fill=Y)
-
-    # TODO maybe put this in a frame and have it only appear after a search to keep the UI simple
-    # TODO pack it after search is pressed/enter key
-    # Large text box to show tweets in GUI once they are pulled
-    # outputBox = Text(root, bg="white", height=20,
-    # wrap=NONE, yscrollcommand=scroll.set)
-    # outputBox.pack(side=BOTTOM, padx=5, pady=5, fill=X)
 
     root.mainloop()
