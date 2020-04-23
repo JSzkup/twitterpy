@@ -309,6 +309,8 @@ def make_outputBox(root):
                      wrap=NONE, yscrollcommand=scroll.set)
     outputBox.pack(side=BOTTOM, padx=5, pady=5, fill=X)
 
+    scroll.config(command=outputBox.yview)
+
     return outputBox
 
 # grabs input from the user in the UI and formats it so twitter can
@@ -326,7 +328,7 @@ def build_query(entries):
     if locWords == "":
         pass
     else:
-        # things are searched 85 miles from the geo point
+        # things are searched 31 miles from the geo point
         geoLoc = ("geocode:" + str(geoLoc.lat) +
                   "," + str(geoLoc.lng) + ",50km,")
         search_query.append(geoLoc)
