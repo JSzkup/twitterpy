@@ -36,11 +36,13 @@ from datetime import datetime
 import re
 
 
-# opens a headless/invisible automated version of chrome
+# opens an automated version of chrome
 def init_driver():
+    # opens chrome options and enables a headless flag so chrome doesnt show
     chrome_options = Options()
     chrome_options.add_argument("--headless")
 
+    # sets the path for the chromedriver and enables options to be used
     driver = webdriver.Chrome(
         executable_path=r'chromedriver.exe', options=chrome_options)
 
@@ -48,9 +50,10 @@ def init_driver():
 
 
 # compiling regex query early as dictionary, once for optimization
+# Needs to find the FIRST one per line
 def init_regex():
     regex = {
-        # Needs to find the FIRST one per line
+        # Searches for the Tweet Name, Username, and body text seperately
         "name": re.compile(r'(?P<name>[a-zA-Z0-9 _.]{,50})'),
         "username": re.compile(r'(?P<username>@[a-zA-Z_0-9]{,15})'),
         "text": re.compile(r'((?P<before>(\d(s|m|h|d))|(>@[a-zA-Z_0-9]{,15})|(and \d others))(?P<text>.{,1000}))', re.DOTALL | re.MULTILINE)
@@ -63,6 +66,7 @@ def init_regex():
 # opens twitter explore page in the browser
 def login_twitter(driver):
 
+    # Opens twitters explore page to avoid the need to log in
     driver.get("https://twitter.com/explore")
     driver.wait = WebDriverWait(driver, 1)
 
@@ -77,6 +81,7 @@ class WaitForMoreThanNElementsToBePresent(object):
 
     def __call__(self, driver):
         try:
+            # decides if there are any new tweets on the page
             elements = EC._find_elements(driver, self.locator)
             return len(elements) > self.count
         except selenium.common.exceptions.StaleElementReferenceException:
@@ -256,9 +261,11 @@ def parse_tweets(outputBox, unparsedtweet, regexDict, search):
             elif key == 'text':
                 text = "NO TEXT"
 
+    # outputs the tweets found to the GUI with a line break inbetween them
     outputBox.insert(INSERT, f"{name} \n {username} \n {text} \n")
     outputBox.insert(INSERT, "\n")
 
+    # builds an object with each part of a single tweet separated
     finalTweet = TweetObject(name, username, text)
 
     # f.write(unparsedtweet)
@@ -301,14 +308,17 @@ def make_form(root, FIELDS):
 
 def make_outputBox(root):
 
-    # TODO scrollbar not able to be clicked and dragged
+    # creates and packs scrollbar
     scroll = Scrollbar(root)
     scroll.pack(side=RIGHT, fill=Y)
 
+    # creates textbox for Tweets to be printed to GUI
+    # Disallows textwrap and defines it as a Y scrolling box
     outputBox = Text(root, bg="white", height=20,
                      wrap=NONE, yscrollcommand=scroll.set)
     outputBox.pack(side=BOTTOM, padx=5, pady=5, fill=X)
 
+    # attatches the scroll bar to the text box to allow clicking and dragging
     scroll.config(command=outputBox.yview)
 
     return outputBox
@@ -420,6 +430,7 @@ def twitter_func(root, search, latest, loop, showOutput):
         # close the driver:
         close_driver(driver)
 
+        # if the user selects to run the program hourly, the program sleeps and runs again after
         if loop == 1:
             time.sleep(3600)
         else:
@@ -455,13 +466,16 @@ if __name__ == "__main__":
         options, text="Show the Latest Tweets only?", variable=var1)
     checkBox.pack(side=LEFT, padx=5, pady=5)
 
+    # checkbox for running the program hourly
     var2 = IntVar()
     checkBox = Checkbutton(options, text="Run Hourly?", variable=var2)
     checkBox.pack(side=LEFT, padx=5, pady=5)
 
+    # blank label added for padding
     padding = Label(options)
     padding.pack(side=LEFT, padx=140)
 
+    # green submit button on the bottom right of the search for clarity
     submitBtn = Button(options, text='Search', bg="light green",
                        command=(lambda e=ents: twitter_func(root, build_query(e), var1.get(), var2.get())))
     submitBtn.pack(side=RIGHT, padx=5, pady=5)
