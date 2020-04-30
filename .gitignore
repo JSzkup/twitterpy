@@ -3,4 +3,7 @@ Unorganized.txt
 Organized.txt
 .selenium/
 .vscode/
+.pylintrc
 env/
+chromedriver.exe
+settings.json

@@ -1,3 +1,8 @@
+<<<<<<< HEAD
 Selenium 
 geocoder
+=======
+Selenium 
+geocoder
+>>>>>>> guiCreate
 pyodbc
