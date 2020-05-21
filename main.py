@@ -232,7 +232,7 @@ def databasing(name, username, text, search):
         return search
 
     except:
-        print("The SQL Database could not be reached and wont be written to.")
+        print("**SQL Write Error**")
         return None
 
 
@@ -289,7 +289,7 @@ def parse_tweets(outputBox, unparsedtweet, regexDict, search):
     username = finalTweet.username
     text = finalTweet.text
 
-    # databasing(name, username, text, search)
+    databasing(name, username, text, search)
     print("")
 
 
