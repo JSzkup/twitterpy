@@ -1,13 +1,13 @@
 import pyodbc
 
 cnxn = pyodbc.connect("Driver={ODBC Driver 17 for SQL Server};"
-                  "Server=rivsqlb;"
-                  "Database=twitterpy;"
-                  "uid=twpyadmin;pwd=tw!tterapipains")
+                      "Server=rivsqlb;"
+                      "Database=twitterpy;"
+                      "uid=twpyadmin;pwd=tw!tterapipains")
 
 cursor = cnxn.cursor()
 
-tableName = "Cat_2020_03_12_12_53_39_82"
+tableName = "Persons"
 
 name = "billy"
 username = "@billybee"
@@ -19,9 +19,7 @@ cursor.execute(f"""CREATE TABLE {tableName} (
                       Text NVARCHAR(1000) NOT NULL);""")
 cnxn.commit()
 
-#DONT USE DOUBLE QUOTES
+# DONT USE DOUBLE QUOTES
 cursor.execute(f"""INSERT INTO {tableName} (Name, Username, Text) 
                 VALUES ('{name}', '{username[1:]}', '{text}');""")
 cnxn.commit()
-
-

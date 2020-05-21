@@ -168,57 +168,72 @@ def pull_tweets(root, driver, regex, search, showOutput):
 
     return tweets
 
+# TODO try/except error handling
 
 # puts the current tweet in a database
 # each query is a new table titled after the search/time search was done
-# def databasing(name, username, text, search):
+
+
+def databasing(name, username, text, search):
     # TODO only connect to sql database once, write everything to it, then close after no tweets are found (cnxn.close())
 
+    try:
+        cnxn = pyodbc.connect("Driver={ODBC Driver 17 for SQL Server};"
+                              r"Server=JON\SQLEXPRESS;"
+                              "Database=twitterpy;"
+                              "Trusted_Connection=yes")
+
+    # For Suffolk County IT SQL server
+
     # cnxn = pyodbc.connect("Driver={ODBC Driver 17 for SQL Server};"
-    # r"Server=JON\SQLEXPRESS;"
-    # "Database=twitterpy;"
-    # "Trusted_Connection=yes")
-##
-    # cursor = cnxn.cursor()
-##
-    # search = ''.join([str(elem) for elem in search])
-    # search = str(search.replace(" ", "_"))
-##
-    # currently = datetime.today()
-    # currently = str(currently).replace(" ", "_")
-    # currently = currently.strip()
-##
-    # currently = currently.replace("-", "_")
-    # currently = currently.replace(":", "_")
-    # currently = currently.replace(".", "_")
-##
-    # TODO cut off trailing milliseconds from datetime
-    # search = (search + currently)
-##
-    # text = text.replace(",", "(comma)")
-##
-    # print("Search/Table Name: " + search)
-    # print("Tweet Name: " + name)
-    # print("Tweet Username: " + username)
-    # print("Tweet text: " + text)
-##
-    # TODO incorrect syntax on table title
-    # https://doc.4d.com/4Dv15/4D/15.6/Rules-for-naming-tables-and-fields.300-3836655.en.html
-    # cursor.execute(f"""CREATE TABLE {search} (
-    # tweet_name NVARCHAR(60) NOT NULL,
-    # tweet_user NVARCHAR(20) NOT NULL,
-    # tweet_text NVARCHAR(1000) NOT NULL);""")
-    # cnxn.commit()
-##
-    # cursor.execute(f"""INSERT INTO {search}
-    # (tweet_name, tweet_user, tweet_text)
-    # VALUES
-    # ('{name}'),
-    # ('{username[1:]}'),
-    # ('{text}');""")
-    # cnxn.commit()
-    # cnxn.close()
-    # return search
+    #       "Server=rivsqlb;"
+    #       "Database=twitterpy;"
+    #       "uid=twpyadmin;pwd=tw!tterapipains")
+
+        cursor = cnxn.cursor()
+
+        search = ''.join([str(elem) for elem in search])
+        search = str(search.replace(" ", "_"))
+
+        currently = datetime.today()
+        currently = str(currently).replace(" ", "_")
+        currently = currently.strip()
+
+        currently = currently.replace("-", "_")
+        currently = currently.replace(":", "_")
+        currently = currently.replace(".", "_")
+
+        # TODO cut off trailing milliseconds from datetime
+        search = (search + currently)
+
+        text = text.replace(",", "(comma)")
+
+        print("Search/Table Name: " + search)
+        print("Tweet Name: " + name)
+        print("Tweet Username: " + username)
+        print("Tweet text: " + text)
+
+        # TODO incorrect syntax on table title
+        # https://doc.4d.com/4Dv15/4D/15.6/Rules-for-naming-tables-and-fields.300-3836655.en.html
+        cursor.execute(f"""CREATE TABLE {search} (
+        tweet_name NVARCHAR(60) NOT NULL,
+        tweet_user NVARCHAR(20) NOT NULL,
+        tweet_text NVARCHAR(1000) NOT NULL);""")
+        cnxn.commit()
+
+        cursor.execute(f"""INSERT INTO {search}
+        (tweet_name, tweet_user, tweet_text)
+        VALUES
+        ('{name}'),
+        ('{username[1:]}'),
+        ('{text}');""")
+        cnxn.commit()
+        cnxn.close()
+        return search
+
+    except:
+        print("The SQL Database could not be reached and wont be written to.")
+        return None
 
 
 # object representing each tweet
