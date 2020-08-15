@@ -11,12 +11,3 @@ Make sure chromedriver path is correct
 
 $ pip install -Ur requirements.txt
 
-## If logging into twitter
-
-**GMAIL ACCOUNT:**
-webdevintern619
-vg4l7xhjfh1029
-
-**TWITTER ACCOUNT:**
-Intern619
-vg4l7xhjfh
